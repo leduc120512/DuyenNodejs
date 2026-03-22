@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Orders - Fan Shop</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  
+  <div class="container">
+
+    
+    <form action="/admin/orders" method="GET" class="search-form">
+      <input type="text" name="search" placeholder="Search by customer name..." value="<%= search %>">
+      <button type="submit" class="btn btn-secondary">Search</button>
+    </form>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(order => { %>
+          <tr>
+            <td>#<%= order._id.toString().slice(-6) %></td>
+         <td><%= order.user ? order.user.fullName : 'Unknown User' %></td>
+
+          <td>$<%= order.totalAmount ? order.totalAmount.toFixed(2) : 'N/A' %></td>
+
+            <td><span class="status status-<%= order.status %>"><%= order.status %></span></td>
+            <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+            <td class="actions">
+              <a href="/admin/orders/<%= order._id %>" class="btn btn-sm btn-secondary">View</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart - Fan Shop</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  
+  <div class="container">
+
+    
+    <% if (cart.length === 0) { %>
+      <p class="empty-cart">Your cart is empty. <a href="/products">Continue shopping</a></p>
+    <% } else { %>
+      <table class="cart-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% cart.forEach(item => { %>
+            <tr>
+              <td>
+                <div class="cart-product">
+                  <img src="<%= item.image %>" alt="<%= item.name %>">
+                  <span><%= item.name %></span>
+                </div>
+              </td>
+              <td>$<%= item.price.toFixed(2) %></td>
+              <td>
+                <form action="/cart/update" method="POST" class="quantity-form">
+                  <input type="hidden" name="productId" value="<%= item.productId %>">
+                  <input type="number" name="quantity" value="<%= item.quantity %>" min="1">
+                  <button type="submit" class="btn btn-sm btn-secondary">Update</button>
+                </form>
+              </td>
+              <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+              <td>
+                <form action="/cart/remove" method="POST">
+                  <input type="hidden" name="productId" value="<%= item.productId %>">
+                  <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+          <tr class="total-row">
+            <td colspan="3"><strong>Total</strong></td>
+            <td colspan="2"><strong>$<%= total.toFixed(2) %></strong></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="cart-actions">
+        <a href="/products" class="btn btn-secondary">Continue Shopping</a>
+        <a href="/checkout" class="btn btn-primary">Proceed to Checkout</a>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

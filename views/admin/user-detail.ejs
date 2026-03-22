@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Detail - Fan Shop</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  
+  <div class="container">
+    <div class="page-header">
+      <h1>User: <%= targetUser.username %></h1>
+      <a href="/admin/users" class="btn btn-secondary">Back to List</a>
+      <a href="/admin/users/<%= targetUser._id %>/manage" class="btn btn-warning">Manage Account</a>
+    </div>
+    
+    <div class="card">
+      <h2>Basic Information</h2>
+      <table class="info-table">
+        <tr>
+          <th>Username</th>
+          <td><%= targetUser.username %></td>
+        </tr>
+        <tr>
+          <th>Email</th>
+          <td><%= targetUser.email %></td>
+        </tr>
+        <tr>
+          <th>Full Name</th>
+          <td><%= targetUser.fullName || '-' %></td>
+        </tr>
+        <tr>
+          <th>Phone</th>
+          <td><%= targetUser.phone || '-' %></td>
+        </tr>
+        <tr>
+          <th>Address</th>
+          <td><%= targetUser.address || '-' %></td>
+        </tr>
+        <tr>
+          <th>Role</th>
+          <td><%= targetUser.role %></td>
+        </tr>
+        <tr>
+          <th>Created At</th>
+          <td><%= new Date(targetUser.createdAt).toLocaleString() %></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Account Status</h2>
+      <table class="info-table">
+        <tr>
+          <th>Active</th>
+          <td>
+            <% if (targetUser.isActive) { %>
+              <span class="status-badge success">Yes</span>
+            <% } else { %>
+              <span class="status-badge danger">No</span>
+            <% } %>
+          </td>
+        </tr>
+        <tr>
+          <th>Banned</th>
+          <td>
+            <% if (targetUser.isBanned) { %>
+              <span class="status-badge danger">Yes</span>
+            <% } else { %>
+              <span class="status-badge success">No</span>
+            <% } %>
+          </td>
+        </tr>
+        <% if (targetUser.isBanned || targetUser.banReason) { %>
+          <tr>
+            <th>Ban Reason</th>
+            <td><%= targetUser.banReason || 'No reason provided' %></td>
+          </tr>
+          <tr>
+            <th>Banned At</th>
+            <td><%= targetUser.bannedAt ? new Date(targetUser.bannedAt).toLocaleString() : '-' %></td>
+          </tr>
+        <% } %>
+        <tr>
+          <th>Login Attempts</th>
+          <td><%= targetUser.loginAttempts || 0 %></td>
+        </tr>
+        <% if (targetUser.lockUntil && new Date(targetUser.lockUntil) > new Date()) { %>
+          <tr>
+            <th>Locked Until</th>
+            <td><%= new Date(targetUser.lockUntil).toLocaleString() %></td>
+          </tr>
+        <% } %>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

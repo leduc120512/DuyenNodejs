@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Details - Fan Shop</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  
+  <div class="container">
+    <h1>Order #<%= order._id.toString().slice(-6) %></h1>
+    
+    <div class="order-detail">
+      <div class="order-info">
+        <h3>Customer Information</h3>
+        <p><strong>Name:</strong> <%= order.shippingAddress.fullName %></p>
+        <p><strong>Phone:</strong> <%= order.shippingAddress.phone %></p>
+        <p><strong>Address:</strong> <%= order.shippingAddress.address %></p>
+        <p><strong>Email:</strong> <%= order.user.email %></p>
+      </div>
+      
+      <div class="order-status">
+        <h3>Order Status</h3>
+        <form action="/admin/orders/<%= order._id %>/status" method="POST">
+          <select name="status" class="status-select">
+            <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>
+            <option value="processing" <%= order.status === 'processing' ? 'selected' : '' %>>Processing</option>
+            <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Shipped</option>
+            <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+            <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+          </select>
+          <button type="submit" class="btn btn-primary">Update Status</button>
+        </form>
+      </div>
+    </div>
+    
+    <h3>Order Items</h3>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% order.items.forEach(item => { %>
+          <tr>
+            <td><%= item.product.name %></td>
+            <td>$<%= item.price.toFixed(2) %></td>
+            <td><%= item.quantity %></td>
+            <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+          </tr>
+        <% }) %>
+        <tr class="total-row">
+          <td colspan="3"><strong>Total</strong></td>
+          <td><strong>$<%= order.totalAmount.toFixed(2) %></strong></td>
+        </tr>
+      </tbody>
+    </table>
+    
+ 
+  </div>
+</body>
+</html>

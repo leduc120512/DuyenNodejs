@@ -1,0 +1,289 @@
+<nav class="main-header">
+  <div class="header-container">
+    <!-- LOGO -->
+    <a href="/" class="logo"> Shop Thương Mại Điện tử </a>
+
+    <!-- SEARCH -->
+    <div class="search-wrapper">
+      <!-- Đổi từ <form> sang <div> để dễ control overflow -->
+      <input id="search-input" placeholder="Tìm kiếm quạt mát..." />
+      <button>Search</button>
+      <div id="ai-suggest-box"></div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <ul class="nav-menu">
+      <% if (user && user.userId) { %> <% if (user.userRole === 'admin') { %>
+      <li><a href="/admin/dashboard">Dashboard</a></li>
+      <li><a href="/admin/products">Products</a></li>
+      <li><a href="/admin/categories">Categories</a></li>
+      <li><a href="/admin/orders">Orders</a></li>
+      <% } else { %>
+      <li><a href="/cart">Cart</a></li>
+      <li><a href="/orders">My Orders</a></li>
+      <li><a href="/profile">Profile</a></li>
+      <% } %>
+
+      <li class="username"><%= user.userName %></li>
+      <li><a href="/auth/logout">Logout</a></li>
+
+      <% } else { %>
+      <li><a href="/">Home</a></li>
+      <li><a href="/auth/login">Login</a></li>
+      <li><a href="/auth/register">Register</a></li>
+      <% } %>
+    </ul>
+  </div>
+</nav>
+
+<!-- STYLE - ĐÃ FIX ĐỂ DROPDOWN HIỆN CHẮC CHẮN -->
+<style>
+  .main-header {
+    background-color: #ee4d2d;
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Không quá cao để tránh conflict */
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: visible !important; /* Quan trọng */
+  }
+
+  .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    position: relative; /* Tạo context nếu cần */
+    overflow: visible !important;
+  }
+
+  .logo {
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+    margin-right: 32px;
+    white-space: nowrap;
+  }
+
+  /* SEARCH WRAPPER - CHA TRỰC TIẾP CỦA DROPDOWN */
+  .search-wrapper {
+    position: relative !important; /* BẮT BUỘC: absolute tính từ đây */
+    flex: 1;
+    max-width: 580px;
+    display: flex;
+    background: #fff;
+    border-radius: 6px;
+    overflow: visible !important; /* KHÔNG ĐƯỢC hidden */
+    z-index: 10; /* Để nổi hơn các phần khác nếu cần */
+  }
+
+  .search-wrapper input {
+    flex: 1;
+    padding: 0 16px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    height: 44px;
+  }
+
+  .search-wrapper input::placeholder {
+    color: #999;
+  }
+
+  .search-wrapper button {
+    background: #f7553b;
+    color: white;
+    border: none;
+    padding: 0 24px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .search-wrapper button:hover {
+    background: #e03e24;
+  }
+
+  /* DROPDOWN - ÉP HIỆN */
+  #ai-suggest-box {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    width: 100% !important;
+    background: white !important;
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+    margin-top: 4px !important;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 999999 !important; /* Siêu cao để vượt mọi thứ */
+    display: none; /* Ban đầu ẩn */
+    visibility: visible !important;
+  }
+
+  #ai-suggest-box::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  #ai-suggest-box::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+  }
+
+  /* Các class còn lại giữ nguyên, nhưng thêm !important nếu cần */
+  .suggest-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.15s;
+  }
+
+  .suggest-item:hover {
+    background: #f8f8f8;
+  }
+
+  .suggest-item img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 16px;
+  }
+
+  .suggest-info {
+    flex: 1;
+  }
+
+  .suggest-name {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .suggest-price {
+    font-size: 15px;
+    color: #ee4d2d;
+    font-weight: 600;
+  }
+
+  .stock {
+    font-size: 13px;
+    color: #2e7d32;
+  }
+
+  .stock.zero {
+    color: #d32f2f;
+  }
+
+  .sold {
+    font-size: 13px;
+    color: #757575;
+  }
+
+  /* Nav menu giữ nguyên */
+  .nav-menu {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-menu li {
+    margin-left: 24px;
+  }
+
+  .nav-menu a {
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header-container {
+      flex-wrap: wrap;
+      height: auto;
+    }
+    .search-wrapper {
+      max-width: 100%;
+      margin: 8px 0;
+    }
+    .nav-menu {
+      display: none;
+    }
+  }
+</style>
+
+<!-- SCRIPT - Giữ nguyên như lần trước, đã có debug log -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const input = document.getElementById("search-input");
+    const suggestBox = document.getElementById("ai-suggest-box");
+
+    if (!input || !suggestBox) {
+      console.error("Element missing");
+      return;
+    }
+
+    console.log("Search script OK");
+
+    input.addEventListener("focus", loadSuggest);
+
+    async function loadSuggest() {
+      console.log("Đang tải gợi ý...");
+      try {
+        const res = await fetch("/api/ai-suggest");
+        if (!res.ok) throw new Error(`API ${res.status}`);
+        const data = await res.json();
+        console.log("Dữ liệu:", data);
+
+        if (!data?.length) {
+          suggestBox.style.display = "none";
+          return;
+        }
+
+        suggestBox.innerHTML = data
+          .map(
+            (p) => `
+          <a href="/products/${p._id}" class="suggest-item">
+            <img src="${p.image || "/images/no-image.png"}" alt="${p.name}">
+            <div class="suggest-info">
+              <div class="suggest-name">${p.name}</div>
+              <div class="suggest-price">${Number(p.price).toLocaleString(
+                "vi-VN"
+              )} ₫</div>
+              <div>
+                </div>
+
+              <!-- <p class="stock ${p.stock <= 0 ? "zero" : ""}">
+                ${p.stock > 0 ? `Available: ${p.stock} units` : "Hết hàng"}
+              </p>
+              <p class="sold">Sold: ${p.sold || 0} units</p> -->
+            </div>
+          </a>
+        `
+          )
+          .join("");
+
+        suggestBox.style.display = "block";
+        console.log("Hiển thị OK");
+      } catch (err) {
+        console.error("Lỗi:", err);
+        suggestBox.style.display = "none";
+      }
+    }
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".search-wrapper")) {
+        suggestBox.style.display = "none";
+      }
+    });
+  });
+</script>

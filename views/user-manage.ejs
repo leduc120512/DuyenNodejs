@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage User: <%= targetUser.username %> - Fan Shop</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  
+  <div class="container">
+    <h1>Manage Account: <%= targetUser.username %></h1>
+    
+    <% if (error) { %>
+      <div class="alert alert-error"><%= error %></div>
+    <% } %>
+    
+    <div class="card mb-4">
+      <h2>Current Status</h2>
+      <p>
+        Role: <strong><%= targetUser.role %></strong> | 
+        Active: <strong><%= targetUser.isActive ? 'Yes' : 'No' %></strong> | 
+        Banned: <strong><%= targetUser.isBanned ? 'Yes' : 'No' %></strong>
+      </p>
+      <% if (targetUser.loginAttempts > 0) { %>
+        <p>Failed login attempts: <strong><%= targetUser.loginAttempts %></strong></p>
+      <% } %>
+    </div>
+    
+    <form action="/admin/users/<%= targetUser._id %>/manage" method="POST" class="form">
+      <div class="form-group">
+        <label>Action</label>
+        <select name="action" required>
+          <option value="">-- Select Action --</option>
+          <option value="ban">Ban Account (Permanent)</option>
+          <option value="unban">Unban Account</option>
+          <option value="suspend">Suspend / Deactivate</option>
+          <option value="activate">Activate Account</option>
+          <option value="reset-login-attempts">Reset Login Attempts & Unlock</option>
+          <option value="change-role">Change Role</option>
+        </select>
+      </div>
+      
+      <div class="form-group" id="ban-reason-group" style="display:none;">
+        <label for="banReason">Ban Reason (required if banning)</label>
+        <textarea id="banReason" name="banReason" rows="3"></textarea>
+      </div>
+      
+      <div class="form-group" id="role-group" style="display:none;">
+        <label for="role">New Role</label>
+        <select id="role" name="role">
+          <option value="user">User</option>
+          <option value="moderator">Moderator</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Apply Action</button>
+        <a href="/admin/users/<%= targetUser._id %>" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.querySelector('[name="action"]').addEventListener('change', function() {
+      const val = this.value;
+      document.getElementById('ban-reason-group').style.display = val === 'ban' ? 'block' : 'none';
+      document.getElementById('role-group').style.display = val === 'change-role' ? 'block' : 'none';
+    });
+  </script>
+</body>
+</html>

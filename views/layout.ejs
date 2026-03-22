@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Fan Shop' %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <a href="/" class="logo">🌀 Fan Shop</a>
+      <ul class="nav-links">
+        <% if (user && user.userId) { %>
+          <% if (user.userRole === 'admin') { %>
+            <li><a href="/admin/dashboard">Dashboard</a></li>
+            <li><a href="/admin/products">Products</a></li>
+            <li><a href="/admin/categories">Categories</a></li>
+            <li><a href="/admin/orders">Orders</a></li>
+          <% } else { %>
+            <li><a href="/">Home</a></li>
+            <li><a href="/products">Products</a></li>
+            <li><a href="/cart">Cart</a></li>
+            <li><a href="/orders">My Orders</a></li>
+            <li><a href="/profile">Profile</a></li>
+          <% } %>
+          <li><span class="user-name">Hello, <%= user.userName %></span></li>
+          <li><a href="/auth/logout" class="btn-logout">Logout</a></li>
+        <% } else { %>
+          <li><a href="/">Home</a></li>
+          <li><a href="/products">Products</a></li>
+          <li><a href="/auth/login">Login</a></li>
+          <li><a href="/auth/register">Register</a></li>
+        <% } %>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <%- body %>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 Fan Shop. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

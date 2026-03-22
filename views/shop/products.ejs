@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products - Fan Shop</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  
+  <div class="container">
+ 
+    
+    <!-- <div class="filters">
+      <form action="/products" method="GET" class="filter-form">
+        <input type="text" name="search" placeholder="Search products..." value="<%= search %>">
+        <select name="category">
+          <option value="">All Categories</option>
+          <% categories.forEach(cat => { %>
+            <option value="<%= cat._id %>" <%= selectedCategory === cat._id.toString() ? 'selected' : '' %>>
+              <%= cat.name %>
+            </option>
+          <% }) %>
+        </select>
+        <button type="submit" class="btn btn-secondary">Filter</button>
+      </form>
+    </div> -->
+    
+    <div class="product-grid">
+      <% products.forEach(product => { %>
+        <div class="product-card">
+          <img src="<%= product.image %>" alt="<%= product.name %>">
+          <h3><%= product.name %></h3>
+       <p class="category"><%= product.category ? product.category.name : 'No Category' %></p>
+
+          <p class="price">$<%= product.price.toFixed(2) %></p>
+          <p class="stock">In stock: <%= product.stock %></p>
+          <a href="/products/<%= product._id %>" class="btn btn-secondary">View Details</a>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</body>
+</html>

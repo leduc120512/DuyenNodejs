@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fan Shop - Quạt điện chất lượng cao</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary: #007bff;
+        --primary-dark: #0056b3;
+        --gray: #6c757d;
+        --light: #f8f9fa;
+        --dark: #343a40;
+      }
+
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        background: var(--light);
+        color: var(--dark);
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+      }
+
+      .hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        padding: 100px 20px;
+      }
+
+      .hero h1 {
+        margin: 0 0 20px;
+        font-size: 3rem;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 12px 28px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary {
+        background: white;
+        color: var(--primary-dark);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-secondary {
+        background: var(--primary);
+        color: white;
+        border: none;
+      }
+
+      .btn-secondary:hover {
+        background: var(--primary-dark);
+      }
+
+      h2.section-title {
+        font-size: 2.2rem;
+        margin: 50px 0 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      h2.section-title::after {
+        content: "";
+        width: 80px;
+        height: 4px;
+        background: var(--primary);
+        position: absolute;
+        bottom: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 24px;
+        margin-bottom: 60px;
+      }
+
+      .product-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.25s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+
+      .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+      }
+
+      .product-card img {
+        width: 100%;
+        height: 220px;
+        object-fit: contain;
+        background: #f9f9f9;
+        padding: 15px;
+      }
+
+      .product-card .info {
+        padding: 16px 20px;
+      }
+
+      .product-card h3 {
+        font-size: 1.15rem;
+        margin: 0 0 8px;
+        height: 2.8em;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+
+      .product-card .category {
+        color: var(--gray);
+        font-size: 0.9rem;
+        margin: 0 0 6px;
+      }
+
+      .product-card .price {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #e63946;
+        margin: 8px 0;
+      }
+
+      .product-card .meta {
+        font-size: 0.9rem;
+        color: var(--gray);
+        margin-top: 8px;
+      }
+
+      .category-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        margin: 40px 0 80px;
+      }
+
+      .category-item {
+        padding: 10px 24px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        text-decoration: none;
+        color: var(--dark);
+        transition: all 0.2s;
+      }
+
+      .category-item:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+
+      .debug-info {
+        background: #fff3cd;
+        padding: 12px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('../partials/navbar') %>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <h1>Chào mừng đến với chúng tôi</h1>
+        <p>Quạt điện chính hãng – mát lạnh cả năm</p>
+        <a href="/products" class="btn btn-primary btn-lg">Mua sắm ngay</a>
+      </div>
+    </section>
+
+    <div class="container">
+      <!-- Debug (xóa hoặc comment khi lên production) -->
+
+      <!-- Recommended For You -->
+      <% if (recommendedProducts && recommendedProducts.length > 0) { %>
+      <section>
+        <h2 class="section-title">Gợi ý dành riêng cho bạn</h2>
+        <div class="product-grid">
+          <% recommendedProducts.forEach(product => { %>
+          <a href="/products/<%= product._id %>" class="product-card">
+            <img
+              src="<%= product.image || '/images/placeholder-product.jpg' %>"
+              alt="<%= product.name %>"
+              loading="lazy"
+            />
+            <div class="info">
+              <h3><%= product.name %></h3>
+              <p class="category"><%= product.category?.name || 'Khác' %></p>
+              <p class="price">
+                <%= product.price.toLocaleString('vi-VN') %> ₫
+              </p>
+              <p class="meta">
+                Đánh giá: <%= product.rating || 'N/A' %> ★ | Còn: <%=
+                product.stock %> sp
+              </p>
+            </div>
+          </a>
+          <% }) %>
+        </div>
+      </section>
+      <% } %>
+
+      <!-- Top Selling -->
+      <section>
+        <h2 class="section-title">Top sản phẩm bán chạy</h2>
+        <div class="product-grid">
+          <% topProducts.forEach(product => { %>
+          <a href="/products/<%= product._id %>" class="product-card">
+            <img
+              src="<%= product.image || '/images/placeholder-product.jpg' %>"
+              alt="<%= product.name %>"
+              loading="lazy"
+            />
+            <div class="info">
+              <h3><%= product.name %></h3>
+              <p class="category">
+                <%= product.category?.name || 'Chưa phân loại' %>
+              </p>
+              <p class="price">
+                <%= product.price.toLocaleString('vi-VN') %> ₫
+              </p>
+              <p class="meta">
+                Đã bán: <%= product.sold || 0 %> | Còn: <%= product.stock %>
+              </p>
+            </div>
+          </a>
+          <% }) %>
+        </div>
+      </section>
+
+      <!-- Categories -->
+      <section>
+        <h2 class="section-title">Danh mục sản phẩm</h2>
+        <div class="category-list">
+          <% categories.forEach(category => { %>
+          <a
+            href="/products?category=<%= category._id %>"
+            class="category-item"
+          >
+            <%= category.name %>
+          </a>
+          <% }) %>
+        </div>
+      </section>
+
+      <!-- All Products -->
+      <section>
+        <h2 class="section-title">Tất cả sản phẩm</h2>
+        <div class="product-grid">
+          <% products.forEach(product => { %>
+          <a href="/products/<%= product._id %>" class="product-card">
+            <img
+              src="<%= product.image || '/images/placeholder-product.jpg' %>"
+              alt="<%= product.name %>"
+              loading="lazy"
+            />
+            <div class="info">
+              <h3><%= product.name %></h3>
+              <p class="category">
+                <%= product.category?.name || 'Chưa phân loại' %>
+              </p>
+              <p class="price">
+                <%= product.price.toLocaleString('vi-VN') %> ₫
+              </p>
+              <p class="meta">
+                Tồn kho: <%= product.stock %> | Đánh giá: <%= product.rating ||
+                'N/A' %>
+              </p>
+            </div>
+          </a>
+          <% }) %>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

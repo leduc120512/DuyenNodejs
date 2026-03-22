@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Products - Fan Shop</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  
+  <div class="container">
+    <div class="page-header">
+
+      <a href="/admin/products/add" class="btn btn-primary">Add New Product</a>
+    </div>
+    
+    <form action="/admin/products" method="GET" class="search-form">
+      <input type="text" name="search" placeholder="Search products..." value="<%= search %>">
+      <button type="submit" class="btn btn-secondary">Search</button>
+    </form>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Sold</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% products.forEach(product => { %>
+          <tr>
+            <td><img src="<%= product.image %>" alt="<%= product.name %>" class="product-thumb"></td>
+            <td><%= product.name %></td>
+            <td><%= product.category.name %></td>
+            <td>$<%= product.price.toFixed(2) %></td>
+            <td><%= product.stock %></td>
+            <td><%= product.sold %></td>
+            <td class="actions">
+              <a href="/admin/products/edit/<%= product._id %>" class="btn btn-sm btn-secondary">Edit</a>
+              <form action="/admin/products/delete/<%= product._id %>" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

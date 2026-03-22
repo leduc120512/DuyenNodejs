@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders - Fan Shop</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  
+  <div class="container">
+
+    
+    <form action="/orders" method="GET" class="search-form">
+      <input type="text" name="search" placeholder="Search by product name..." value="<%= search %>">
+      <button type="submit" class="btn btn-secondary">Search</button>
+    </form>
+    
+    <% if (orders.length === 0) { %>
+      <p class="empty-orders">You haven't placed any orders yet. <a href="/products">Start shopping</a></p>
+    <% } else { %>
+      <div class="orders-list">
+        <% orders.forEach(order => { %>
+          <div class="order-card">
+            <div class="order-header">
+              <h3>Order #<%= order._id.toString().slice(-6) %></h3>
+              <span class="status status-<%= order.status %>"><%= order.status %></span>
+            </div>
+            <p>Date: <%= new Date(order.createdAt).toLocaleDateString() %></p>
+            <p>Total: $<%= order.totalAmount.toFixed(2) %></p>
+            <p>Items: <%= order.items.length %></p>
+            <div class="order-actions">
+              <a href="/orders/<%= order._id %>" class="btn btn-sm btn-secondary">View Details</a>
+              <% if (order.status === 'pending') { %>
+                <form action="/orders/<%= order._id %>/cancel" method="POST" style="display: inline;">
+                  <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Cancel this order?')">Cancel Order</button>
+                </form>
+              <% } %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>
