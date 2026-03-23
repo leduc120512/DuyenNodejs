@@ -12,7 +12,7 @@ router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    const user = await User.findOne({ username }).select("+password"); // ⚠️ QUAN TRỌNG
+    const user = await User.findOne({ username }).select("+password");
 
     if (!user) {
       return res.render("auth/login", {
@@ -28,11 +28,17 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // Lưu session
     req.session.userId = user._id.toString();
     req.session.userRole = user.role;
     req.session.userName = user.fullName;
 
-    res.redirect("/");
+    // 🔥 Redirect theo role
+    if (user.role === "admin") {
+      return res.redirect("/admin/dashboard");
+    } else {
+      return res.redirect("/");
+    }
   } catch (error) {
     console.error(error);
     res.render("auth/login", {

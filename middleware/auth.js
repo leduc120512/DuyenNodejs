@@ -1,25 +1,22 @@
 const isAuthenticated = (req, res, next) => {
   if (req.session && req.session.userId) {
-    return next();
+    return next()
   }
-  res.redirect("/auth/login");
-};
+  res.redirect("/auth/login")
+}
 
 const isAdmin = (req, res, next) => {
-  if (
-    req.session &&
-    req.session.userId &&
-    (req.session.userRole === "admin" || req.session.userRole === "user")
-  ) {
-    return next();
+  if (req.session && req.session.userId && req.session.userRole === "admin") {
+    return next()
   }
-  res.redirect("/auth/login");
-};
+  res.redirect("/auth/login")
+}
+
 const isUser = (req, res, next) => {
   if (req.session && req.session.userId && req.session.userRole === "user") {
-    return next();
+    return next()
   }
-  res.redirect("/auth/login");
-};
+  res.redirect("/auth/login")
+}
 
-module.exports = { isAuthenticated, isAdmin, isUser };
+module.exports = { isAuthenticated, isAdmin, isUser }
