@@ -10,7 +10,7 @@
     <div class="container">
       <div class="product-grid">
         <% products.forEach(product => { %>
-        <div class="product-card">
+        <a href="/products/<%= product._id %>" class="product-card" style="display:block;text-decoration:none;color:inherit;">
           <img src="<%= product.image %>" alt="<%= product.name %>" />
           <h3><%= product.name %></h3>
           <p class="category">
@@ -19,10 +19,7 @@
 
           <p class="price">$<%= product.price.toFixed(2) %></p>
           <p class="stock">In stock: <%= product.stock %></p>
-          <a href="/products/<%= product._id %>" class="btn btn-secondary"
-            >View Details</a
-          >
-        </div>
+        </a>
         <% }) %>
       </div>
     </div>

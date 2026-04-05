@@ -68,7 +68,7 @@ function buildKeywordRegex(message) {
   const terms = normalized
     .split(/\s+/)
     .map((term) => term.trim())
-    .filter((term) => term.length >= 2)
+    .filter((term) => term.length >= 1)
     .slice(0, 8);
 
   if (!terms.length) {
@@ -101,6 +101,117 @@ async function fallbackSearchProducts(message, parsed) {
     const { embedding, searchText, ...safeProduct } = product;
     return safeProduct;
   });
+}
+
+async function getTopViewedSuggestions(query = "", limit = 3) {
+  const safeLimit = Math.min(Math.max(Number(limit) || 3, 1), 10);
+  const keyword = String(query || "").trim();
+
+  const products = await Product.find({ stock: { $gt: 0 } })
+    .select(
+      "name price image viewCount sold searchText description tags createdAt",
+    )
+    .sort({ viewCount: -1, sold: -1, createdAt: -1 })
+    .limit(keyword ? 120 : safeLimit)
+    .lean();
+
+  const normalizedKeyword = normalizeText(keyword);
+  const filteredProducts = normalizedKeyword
+    ? products.filter((product) => {
+        const textBucket = normalizeText(
+          [
+            product.name,
+            product.description,
+            product.searchText,
+            Array.isArray(product.tags) ? product.tags.join(" ") : "",
+          ]
+            .filter(Boolean)
+            .join(" "),
+        );
+
+        return textBucket.includes(normalizedKeyword);
+      })
+    : products;
+
+  return filteredProducts.slice(0, safeLimit).map((product) => ({
+    type: "top_viewed",
+    keyword: product.name,
+    product,
+    createdAt: product.createdAt || new Date(0),
+    viewCount: Number(product.viewCount || 0),
+  }));
+}
+
+function tokenizeQuery(query = "") {
+  return normalizeText(query)
+    .split(/\s+/)
+    .map((term) => term.trim())
+    .filter((term) => term.length >= 1)
+    .slice(0, 8);
+}
+
+function countMatchedTerms(product, terms) {
+  if (!terms.length) return 0;
+
+  const name = normalizeText(product.name || "");
+  const description = normalizeText(product.description || "");
+  const searchText = normalizeText(product.searchText || "");
+  const tags = Array.isArray(product.tags)
+    ? product.tags.map((tag) => normalizeText(tag)).join(" ")
+    : "";
+  const textBucket = `${name} ${description} ${searchText} ${tags}`;
+
+  return terms.reduce((count, term) => {
+    return textBucket.includes(term) ? count + 1 : count;
+  }, 0);
+}
+
+async function getRelatedProductSuggestions(query = "", limit = 6) {
+  const terms = tokenizeQuery(query);
+
+  if (!terms.length) {
+    return [];
+  }
+
+  const products = await Product.find({
+    stock: { $gt: 0 },
+  })
+    .select(
+      "name price image sold viewCount searchText description tags createdAt",
+    )
+    .sort({ viewCount: -1, sold: -1, createdAt: -1 })
+    .limit(200)
+    .lean();
+
+  const joinedQuery = terms.join(" ");
+  const ranked = products
+    .map((product) => ({
+      product,
+      matchScore: countMatchedTerms(product, terms),
+      prefixBoost: normalizeText(product.name || "").startsWith(joinedQuery)
+        ? 2
+        : 0,
+    }))
+    .filter((item) => item.matchScore > 0)
+    .sort((a, b) => {
+      const aFinalScore = a.matchScore + a.prefixBoost;
+      const bFinalScore = b.matchScore + b.prefixBoost;
+      if (bFinalScore !== aFinalScore) return bFinalScore - aFinalScore;
+      if ((b.product.viewCount || 0) !== (a.product.viewCount || 0)) {
+        return (b.product.viewCount || 0) - (a.product.viewCount || 0);
+      }
+      return (b.product.sold || 0) - (a.product.sold || 0);
+    })
+    .slice(0, Math.min(Math.max(Number(limit) || 6, 1), 12));
+
+  return ranked.map((item) => ({
+    type: "related_product",
+    keyword: item.product.name,
+    product: item.product,
+    createdAt: item.product.createdAt || new Date(0),
+    viewCount: Number(item.product.viewCount || 0),
+    matchScore: item.matchScore,
+  }));
 }
 
 exports.aiSearchProducts = async (req, res, next) => {
@@ -194,19 +305,28 @@ exports.aiSearchProducts = async (req, res, next) => {
 
 exports.getSearchHistorySuggestions = async (req, res, next) => {
   try {
-    if (!req.session?.userId) {
-      return res.json({
-        ok: true,
-        suggestions: [],
-      });
-    }
-
     const query = String(req.query.q || "").trim();
     const daysInput = Number.parseInt(String(req.query.days || "7"), 10);
     const days = Number.isNaN(daysInput)
       ? 7
       : Math.min(Math.max(daysInput, 1), 30);
     const sinceDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const relatedSuggestions = query
+      ? await getRelatedProductSuggestions(query, 6)
+      : [];
+    const topViewedSuggestions = await getTopViewedSuggestions(query, 3);
+
+    if (!req.session?.userId) {
+      const guestSuggestions = relatedSuggestions.length
+        ? [...relatedSuggestions, ...topViewedSuggestions]
+        : topViewedSuggestions;
+
+      return res.json({
+        ok: true,
+        suggestions: guestSuggestions,
+      });
+    }
 
     const filter = {
       user: req.session.userId,
@@ -215,15 +335,9 @@ exports.getSearchHistorySuggestions = async (req, res, next) => {
       createdAt: { $gte: sinceDate },
     };
 
-    if (query) {
-      filter.searchKeyword = {
-        $regex: new RegExp(query, "i"),
-      };
-    }
-
     const searchHistories = await UserHistory.find(filter)
       .sort({ createdAt: -1 })
-      .limit(30)
+      .limit(80)
       .populate("product", "name price image")
       .lean();
 
@@ -242,13 +356,13 @@ exports.getSearchHistorySuggestions = async (req, res, next) => {
     const seenProducts = new Set();
     const historySuggestions = [];
     const viewedSuggestions = [];
-    const normalizedQuery = query.toLowerCase();
+    const normalizedQuery = normalizeText(query);
 
     for (const item of searchHistories) {
       const keyword = String(item.searchKeyword || "").trim();
       if (!keyword) continue;
 
-      const normalizedKeyword = keyword.toLowerCase();
+      const normalizedKeyword = normalizeText(keyword);
       if (seenKeywords.has(normalizedKeyword)) continue;
 
       if (normalizedQuery && !normalizedKeyword.includes(normalizedQuery)) {
@@ -274,7 +388,7 @@ exports.getSearchHistorySuggestions = async (req, res, next) => {
 
       if (
         normalizedQuery &&
-        !String(item.product.name).toLowerCase().includes(normalizedQuery)
+        !normalizeText(item.product.name).includes(normalizedQuery)
       ) {
         continue;
       }
@@ -289,9 +403,67 @@ exports.getSearchHistorySuggestions = async (req, res, next) => {
       if (viewedSuggestions.length >= 3) break;
     }
 
-    const suggestions = [...historySuggestions, ...viewedSuggestions].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+    const existingProductIds = new Set(
+      viewedSuggestions
+        .map((item) => String(item.product?._id || ""))
+        .filter(Boolean),
     );
+
+    const mergedTopViewed = topViewedSuggestions.filter((item) => {
+      const productId = String(item.product?._id || "");
+      return productId && !existingProductIds.has(productId);
+    });
+
+    const filteredRelated = relatedSuggestions.filter((item) => {
+      if (!normalizedQuery) return true;
+
+      const keywordText = normalizeText(item.keyword || "");
+      const productName = normalizeText(item.product?.name || "");
+      return (
+        keywordText.includes(normalizedQuery) ||
+        productName.includes(normalizedQuery)
+      );
+    });
+
+    const filteredTopViewed = mergedTopViewed.filter((item) => {
+      if (!normalizedQuery) return true;
+      const productName = normalizeText(
+        item.product?.name || item.keyword || "",
+      );
+      return productName.includes(normalizedQuery);
+    });
+
+    // Interleave results so dropdown always shows a blend of history + product suggestions.
+    const suggestions = [];
+    const maxItems = normalizedQuery ? 14 : 12;
+    let cursor = 0;
+
+    while (suggestions.length < maxItems) {
+      let appended = false;
+
+      if (cursor < historySuggestions.length) {
+        suggestions.push(historySuggestions[cursor]);
+        appended = true;
+      }
+
+      if (cursor < filteredRelated.length && suggestions.length < maxItems) {
+        suggestions.push(filteredRelated[cursor]);
+        appended = true;
+      }
+
+      if (cursor < viewedSuggestions.length && suggestions.length < maxItems) {
+        suggestions.push(viewedSuggestions[cursor]);
+        appended = true;
+      }
+
+      if (cursor < filteredTopViewed.length && suggestions.length < maxItems) {
+        suggestions.push(filteredTopViewed[cursor]);
+        appended = true;
+      }
+
+      if (!appended) break;
+      cursor += 1;
+    }
 
     return res.json({
       ok: true,

@@ -194,6 +194,18 @@
     border: 1px solid #b5e4cc;
   }
 
+  .badge-top {
+    background: linear-gradient(135deg, #e8edff, #d4ddff);
+    color: #3346a8;
+    border: 1px solid #c3cfff;
+  }
+
+  .badge-related {
+    background: linear-gradient(135deg, #fff0db, #ffe3b5);
+    color: #9a5b00;
+    border: 1px solid #ffd89b;
+  }
+
   .suggest-name {
     font-size: 15px;
     font-weight: 700;
@@ -441,10 +453,26 @@
             <div class="suggest-info">
               <div class="suggest-topline">
                 <span class="suggest-badge ${
-                  item.type === "viewed" ? "badge-viewed" : "badge-search"
-                }">${item.type === "viewed" ? "Da xem" : "Lich su tim kiem"}</span>
-                <div class="suggest-name">${
                   item.type === "viewed"
+                    ? "badge-viewed"
+                    : item.type === "top_viewed"
+                    ? "badge-top"
+                    : item.type === "related_product"
+                    ? "badge-related"
+                    : "badge-search"
+                }">${
+              item.type === "viewed"
+                ? "Da xem"
+                : item.type === "top_viewed"
+                ? "Top xem nhieu"
+                : item.type === "related_product"
+                ? "Lien quan"
+                : "Lich su tim kiem"
+            }</span>
+                <div class="suggest-name">${
+                  item.type === "viewed" ||
+                  item.type === "top_viewed" ||
+                  item.type === "related_product"
                     ? escapeHtml(item.product?.name || "San pham da xem")
                     : escapeHtml(item.keyword || "")
                 }</div>
@@ -457,6 +485,10 @@
               <div class="suggest-meta">${
                 item.type === "viewed"
                   ? "Mo lai san pham da xem"
+                  : item.type === "top_viewed"
+                  ? `Duoc xem ${Number(item.viewCount || item.product?.viewCount || 0).toLocaleString("vi-VN")} luot`
+                  : item.type === "related_product"
+                  ? `Hop ${Number(item.matchScore || 0)} tu khoa • ${Number(item.product?.viewCount || item.viewCount || 0).toLocaleString("vi-VN")} luot xem`
                   : "Nhan de tim lai tu khoa"
               }</div>
             </div>
@@ -487,14 +519,14 @@
 
     input.addEventListener("focus", () => {
       clearConfirmMode = false;
-      loadSuggest(input.value);
+      loadSuggest("");
     });
     input.addEventListener("input", () => {
       clearConfirmMode = false;
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
         loadSuggest(input.value);
-      }, 250);
+      }, 120);
     });
 
     input.addEventListener("keydown", (e) => {
@@ -571,7 +603,12 @@
 
       suggestBox.style.display = "none";
 
-      if (type === "viewed" && productId) {
+      if (
+        (type === "viewed" ||
+          type === "top_viewed" ||
+          type === "related_product") &&
+        productId
+      ) {
         window.location.href = `/products/${encodeURIComponent(productId)}`;
         return;
       }

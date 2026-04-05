@@ -1,6 +1,6 @@
 #chatbot-widget {
   position: fixed;
-  left: 20px;
+  right: 20px;
   bottom: 20px;
   z-index: 9999;
 }
@@ -17,7 +17,9 @@
   letter-spacing: 0.3px;
   cursor: pointer;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 #chatbot-toggle:hover {
@@ -35,7 +37,7 @@
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
-  transform-origin: bottom left;
+  transform-origin: bottom right;
   animation: chatbotPopIn 0.22s ease;
 }
 
@@ -165,7 +167,7 @@
 
 @media (max-width: 768px) {
   #chatbot-widget {
-    left: 12px;
+    right: 12px;
     bottom: 12px;
   }
 

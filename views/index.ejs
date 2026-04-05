@@ -64,13 +64,12 @@
 
     <div class="product-grid">
       <% products.forEach(product => { %>
-        <div class="product-card">
+        <a href="/products/<%= product._id %>" class="product-card" style="display:block;text-decoration:none;color:inherit;">
           <img src="<%= product.image %>" alt="<%= product.name %>">
           <h3><%= product.name %></h3>
           <p><%= product.category ? product.category.name : "No Category" %></p>
           <p><%= Number(product.price).toLocaleString("vi-VN") %> đ</p>
-          <a href="/products/<%= product._id %>">Xem chi tiết</a>
-        </div>
+        </a>
       <% }) %>
     </div>
   </div>
