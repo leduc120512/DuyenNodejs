@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const categorySchema = new mongoose.Schema({
   name: {
@@ -11,10 +11,14 @@ const categorySchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  image: {
+    type: String,
+    default: "/images/default-product.jpg",
+  },
   createdAt: {
     type: Date,
     default: Date.now,
   },
-})
+});
 
-module.exports = mongoose.model("Category", categorySchema)
+module.exports = mongoose.model("Category", categorySchema);

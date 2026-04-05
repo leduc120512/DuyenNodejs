@@ -1,49 +1,84 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title : 'Fan Shop' %></title>
-  <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-  <nav class="navbar">
-    <div class="container">
-      <a href="/" class="logo">🌀 Fan Shop</a>
-      <ul class="nav-links">
-        <% if (user && user.userId) { %>
-          <% if (user.userRole === 'admin') { %>
-            <li><a href="/admin/dashboard">Dashboard</a></li>
-            <li><a href="/admin/products">Products</a></li>
-            <li><a href="/admin/categories">Categories</a></li>
-            <li><a href="/admin/orders">Orders</a></li>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= typeof title !== 'undefined' ? title : 'Shop thương mại điện tử' %></title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/chatbot.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="container">
+        <a href="/" class="logo">Shop thương mại điện tử</a>
+        <ul class="nav-links">
+          <% if (user && user.userId) { %> <% if (user.userRole === 'admin') {
+          %>
+          <li><a href="/admin/dashboard">Dashboard</a></li>
+          <li><a href="/admin/products">Products</a></li>
+          <li><a href="/admin/categories">Categories</a></li>
+          <li><a href="/admin/orders">Orders</a></li>
           <% } else { %>
-            <li><a href="/">Home</a></li>
-            <li><a href="/products">Products</a></li>
-            <li><a href="/cart">Cart</a></li>
-            <li><a href="/orders">My Orders</a></li>
-            <li><a href="/profile">Profile</a></li>
+          <li><a href="/">Home</a></li>
+          <li><a href="/products">Products</a></li>
+          <li><a href="/cart">Cart</a></li>
+          <li><a href="/orders">My Orders</a></li>
+          <li><a href="/profile">Profile</a></li>
           <% } %>
           <li><span class="user-name">Hello, <%= user.userName %></span></li>
           <li><a href="/auth/logout" class="btn-logout">Logout</a></li>
-        <% } else { %>
+          <% } else { %>
           <li><a href="/">Home</a></li>
           <li><a href="/products">Products</a></li>
           <li><a href="/auth/login">Login</a></li>
           <li><a href="/auth/register">Register</a></li>
-        <% } %>
-      </ul>
-    </div>
-  </nav>
+          <% } %>
+        </ul>
+      </div>
+    </nav>
 
-  <main class="main-content">
-    <%- body %>
-  </main>
+    <main class="main-content"><%- body %></main>
 
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2025 Fan Shop. All rights reserved.</p>
+    <footer class="footer">
+      <div class="container">
+        <p>&copy; 2026 Shop thương mại điện tử. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <div id="chatbot-widget" aria-live="polite">
+      <div
+        id="chatbot-box"
+        class="hidden"
+        role="dialog"
+        aria-label="Chat support"
+      >
+        <div class="chatbot-header">
+          <strong>Tu van san pham</strong>
+          <button id="chatbot-close" type="button" aria-label="Dong chat">
+            x
+          </button>
+        </div>
+        <div id="chatbot-messages" class="chatbot-messages">
+          <div class="bot-message">
+            Xin chao! Ban can tim san pham nao hom nay?
+          </div>
+        </div>
+        <form id="chatbot-form" class="chatbot-form">
+          <input
+            id="chatbot-input"
+            type="text"
+            placeholder="Nhap tin nhan..."
+            autocomplete="off"
+          />
+          <button type="submit">Gui</button>
+        </form>
+      </div>
+      <button id="chatbot-toggle" type="button" aria-label="Mo chat">
+        Chat
+      </button>
     </div>
-  </footer>
-</body>
+
+    <script src="/js/chatbot.js"></script>
+  </body>
 </html>
+

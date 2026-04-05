@@ -1,15 +1,16 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= product ? 'Edit' : 'Add' %> Product - Fan Shop</title>
+  <title><%= product ? 'Edit' : 'Add' %> Product - Shop thương mại điện tử</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <%- include('../partials/navbar') %>
-  
-  <div class="container">
+  <div class="admin-shell">
+    <%- include('../partials/admin-sidebar') %>
+    <main class="admin-main">
+      <div class="container">
     <h1><%= product ? 'Edit' : 'Add New' %> Product</h1>
     
     <% if (error) { %>
@@ -26,6 +27,46 @@
         <label for="description">Description</label>
         <textarea id="description" name="description" rows="4" required><%= product ? product.description : '' %></textarea>
       </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="color">Colors (comma separated)</label>
+          <input
+            type="text"
+            id="color"
+            name="color"
+            value="<%= product && product.color ? product.color.join(', ') : '' %>"
+            placeholder="black, white, silver"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="size">Sizes (comma separated)</label>
+          <input
+            type="text"
+            id="size"
+            name="size"
+            value="<%= product && product.size ? product.size.join(', ') : '' %>"
+            placeholder="mini, medium, large"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="tags">Tags (comma separated)</label>
+        <input
+          type="text"
+          id="tags"
+          name="tags"
+          value="<%= product && product.tags ? product.tags.join(', ') : '' %>"
+          placeholder="quiet, smart, energy-saving"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="searchText">Search Text</label>
+        <textarea id="searchText" name="searchText" rows="2" placeholder="Keyword for search and AI"><%= product ? (product.searchText || '') : '' %></textarea>
+      </div>
       
       <div class="form-row">
         <div class="form-group">
@@ -38,13 +79,34 @@
           <input type="number" id="stock" name="stock" value="<%= product ? product.stock : '' %>" required>
         </div>
       </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="homeOrder">Home Order (smaller = higher priority)</label>
+          <input
+            type="number"
+            id="homeOrder"
+            name="homeOrder"
+            value="<%= product && product.homeOrder !== undefined ? product.homeOrder : 9999 %>"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>View Count</label>
+          <input
+            type="number"
+            value="<%= product ? (product.viewCount || 0) : 0 %>"
+            readonly
+          >
+        </div>
+      </div>
       
       <div class="form-group">
         <label for="category">Category</label>
         <select id="category" name="category" required>
           <option value="">Select a category</option>
           <% categories.forEach(cat => { %>
-            <option value="<%= cat._id %>" <%= product && product.category._id.toString() === cat._id.toString() ? 'selected' : '' %>>
+            <option value="<%= cat._id %>" <%= product && product.category && String(product.category._id || product.category).toString() === cat._id.toString() ? 'selected' : '' %>>
               <%= cat.name %>
             </option>
           <% }) %>
@@ -52,11 +114,28 @@
       </div>
       
       <div class="form-group">
-        <label for="image">Product Image</label>
-        <% if (product && product.image) { %>
-          <img src="<%= product.image %>" alt="Current image" class="current-image">
+        <label for="images">Product Images (you can choose multiple files)</label>
+
+        <% if (product && product.images && product.images.length) { %>
+          <div class="image-grid-preview">
+            <% product.images.forEach((img, index) => { %>
+              <label class="image-preview-item" style="display:block;margin-bottom:10px;">
+                <img src="<%= img %>" alt="Current image <%= index + 1 %>" class="current-image">
+                <div>
+                  <input
+                    type="checkbox"
+                    name="existingImages"
+                    value="<%= img %>"
+                    checked
+                  >
+                  Keep this image
+                </div>
+              </label>
+            <% }) %>
+          </div>
         <% } %>
-        <input type="file" id="image" name="image" accept="image/*">
+        <input type="file" id="images" name="images" accept="image/*" multiple>
+        <small>Uncheck an existing image to remove it on update.</small>
       </div>
       
       <div class="form-actions">
@@ -64,6 +143,9 @@
         <a href="/admin/products" class="btn btn-secondary">Cancel</a>
       </div>
     </form>
+      </div>
+    </main>
   </div>
 </body>
 </html>
+

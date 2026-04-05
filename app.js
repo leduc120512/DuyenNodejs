@@ -8,7 +8,7 @@ const connectDB = require("./config/database");
 
 const app = express();
 
-// ===== GLOBAL ERROR HANDLER (chống crash) =====
+// ===== GLOBAL ERROR HANDLER =====
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT EXCEPTION:", err);
 });
@@ -17,22 +17,23 @@ process.on("unhandledRejection", (err) => {
   console.error("UNHANDLED REJECTION:", err);
 });
 
-// ===== START SERVER SAU KHI CONNECT DB =====
 const startServer = async () => {
   try {
-    await connectDB(); // 👈 bắt buộc chờ DB
+    await connectDB();
 
-    // View engine
     app.set("view engine", "ejs");
     app.set("views", path.join(__dirname, "views"));
 
-    // Middleware
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(express.static(path.join(__dirname, "public")));
     app.use(methodOverride("_method"));
+    app.use((req, res, next) => {
+      res.locals.currentPath = req.path || "";
+      res.locals.user = req.session;
+      next();
+    });
 
-    // Session (chỉ chạy khi DB OK)
     app.use(
       session({
         secret: process.env.SESSION_SECRET || "secret",
@@ -45,27 +46,42 @@ const startServer = async () => {
         cookie: {
           maxAge: 1000 * 60 * 60 * 24,
         },
-      })
+      }),
     );
 
-    // Routes
     app.use("/auth", require("./routes/auth"));
     app.use("/admin", require("./routes/admin"));
     app.use("/", require("./routes/shop"));
+    app.use("/debug", require("./routes/debug"));
 
-    // 404
+    // AI SEARCH
+    app.use("/api/ai-search", require("./routes/aiSearch.route"));
+
     app.use((req, res) => {
-      res.status(404).send("Page not found");
+      if (req.originalUrl.startsWith("/api/")) {
+        return res.status(404).json({
+          ok: false,
+          message: "API route not found",
+        });
+      }
+
+      return res.status(404).send("Page not found");
     });
 
-    // Error handler
     app.use((err, req, res, next) => {
       console.error("SERVER ERROR:", err);
-      res.status(500).send("Internal Server Error");
+
+      if (req.originalUrl.startsWith("/api/")) {
+        return res.status(500).json({
+          ok: false,
+          message: err.message || "Internal Server Error",
+        });
+      }
+
+      return res.status(500).send("Internal Server Error");
     });
 
-    // Listen PORT (Render tự cấp)
-    const PORT = process.env.PORT || 3000;
+    const PORT = process.env.PORT || 3001;
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });

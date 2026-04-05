@@ -1,10 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fan Shop - Quạt điện chất lượng cao</title>
+    <title>Shop thương mại điện tử - Mua sắm trực tuyến</title>
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/chatbot.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -39,7 +44,46 @@
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         text-align: center;
-        padding: 100px 20px;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .hero-swiper .swiper-slide {
+        position: relative;
+        min-height: 420px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .hero-swiper .banner-image {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .hero-swiper .banner-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(24, 40, 72, 0.72), rgba(69, 42, 108, 0.58));
+      }
+
+      .hero-swiper .banner-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        padding: 32px 20px;
+      }
+
+      .hero-swiper .swiper-pagination-bullet {
+        background: #fff;
+        opacity: 0.6;
+      }
+
+      .hero-swiper .swiper-pagination-bullet-active {
+        opacity: 1;
       }
 
       .hero h1 {
@@ -159,21 +203,35 @@
       }
 
       .category-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
         margin: 40px 0 80px;
       }
 
       .category-item {
-        padding: 10px 24px;
+        padding: 0;
         background: white;
         border: 1px solid #ddd;
-        border-radius: 50px;
+        border-radius: 14px;
         text-decoration: none;
         color: var(--dark);
         transition: all 0.2s;
+        overflow: hidden;
+      }
+
+      .category-item img {
+        width: 100%;
+        height: 130px;
+        object-fit: cover;
+        display: block;
+      }
+
+      .category-item span {
+        display: block;
+        padding: 10px 12px;
+        font-weight: 600;
+        text-align: center;
       }
 
       .category-item:hover {
@@ -196,10 +254,26 @@
 
     <!-- Hero -->
     <section class="hero">
-      <div class="container">
-        <h1>Chào mừng đến với chúng tôi</h1>
-        <p>Quạt điện chính hãng – mát lạnh cả năm</p>
-        <a href="/products" class="btn btn-primary btn-lg">Mua sắm ngay</a>
+      <div class="swiper hero-swiper">
+        <div class="swiper-wrapper">
+          <% const slides = heroBanners && heroBanners.length ? heroBanners : []; %>
+          <% slides.forEach(slide => { %>
+            <div class="swiper-slide">
+              <img
+                class="banner-image"
+                src="<%= slide.image || '/images/banner.png' %>"
+                alt="<%= slide.title || 'Banner' %>"
+              >
+              <div class="banner-overlay"></div>
+              <div class="banner-content">
+                <h1><%= slide.title || 'Shop thương mại điện tử' %></h1>
+                <p><%= slide.description ? slide.description.slice(0, 90) : 'Sản phẩm chính hãng - mua sắm thông minh' %></p>
+                <a href="<%= slide.link || '/products' %>" class="btn btn-primary btn-lg">Xem ngay</a>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+        <div class="swiper-pagination"></div>
       </div>
     </section>
 
@@ -214,7 +288,7 @@
           <% recommendedProducts.forEach(product => { %>
           <a href="/products/<%= product._id %>" class="product-card">
             <img
-              src="<%= product.image || '/images/placeholder-product.jpg' %>"
+              src="<%= (product.images && product.images.length ? product.images[0] : (product.image || '/images/default-product.jpg')) %>"
               alt="<%= product.name %>"
               loading="lazy"
             />
@@ -242,7 +316,7 @@
           <% topProducts.forEach(product => { %>
           <a href="/products/<%= product._id %>" class="product-card">
             <img
-              src="<%= product.image || '/images/placeholder-product.jpg' %>"
+              src="<%= (product.images && product.images.length ? product.images[0] : (product.image || '/images/default-product.jpg')) %>"
               alt="<%= product.name %>"
               loading="lazy"
             />
@@ -272,7 +346,8 @@
             href="/products?category=<%= category._id %>"
             class="category-item"
           >
-            <%= category.name %>
+            <img src="<%= category.image || '/images/default-product.jpg' %>" alt="<%= category.name %>">
+            <span><%= category.name %></span>
           </a>
           <% }) %>
         </div>
@@ -285,7 +360,7 @@
           <% products.forEach(product => { %>
           <a href="/products/<%= product._id %>" class="product-card">
             <img
-              src="<%= product.image || '/images/placeholder-product.jpg' %>"
+              src="<%= (product.images && product.images.length ? product.images[0] : (product.image || '/images/default-product.jpg')) %>"
               alt="<%= product.name %>"
               loading="lazy"
             />
@@ -307,5 +382,55 @@
         </div>
       </section>
     </div>
+
+    <div id="chatbot-widget" aria-live="polite">
+      <div
+        id="chatbot-box"
+        class="hidden"
+        role="dialog"
+        aria-label="Chat support"
+      >
+        <div class="chatbot-header">
+          <strong>Tu van san pham</strong>
+          <button id="chatbot-close" type="button" aria-label="Dong chat">
+            x
+          </button>
+        </div>
+        <div id="chatbot-messages" class="chatbot-messages">
+          <div class="bot-message">
+            Xin chao! Ban can tim san pham nao hom nay?
+          </div>
+        </div>
+        <form id="chatbot-form" class="chatbot-form">
+          <input
+            id="chatbot-input"
+            type="text"
+            placeholder="Nhap tin nhan..."
+            autocomplete="off"
+          />
+          <button type="submit">Gui</button>
+        </form>
+      </div>
+      <button id="chatbot-toggle" type="button" aria-label="Mo chat">
+        Chat
+      </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+      new Swiper(".hero-swiper", {
+        loop: true,
+        autoplay: {
+          delay: 3000,
+          disableOnInteraction: false,
+        },
+        pagination: {
+          el: ".swiper-pagination",
+          clickable: true,
+        },
+      });
+    </script>
+    <script src="/js/chatbot.js"></script>
   </body>
 </html>
+

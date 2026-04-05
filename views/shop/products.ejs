@@ -1,38 +1,40 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Products - Fan Shop</title>
+  <title>Products - Shop thương mại điện tử</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <%- include('../partials/navbar') %>
   
   <div class="container">
- 
-    
-    <!-- <div class="filters">
-      <form action="/products" method="GET" class="filter-form">
-        <input type="text" name="search" placeholder="Search products..." value="<%= search %>">
-        <select name="category">
-          <option value="">All Categories</option>
-          <% categories.forEach(cat => { %>
-            <option value="<%= cat._id %>" <%= selectedCategory === cat._id.toString() ? 'selected' : '' %>>
-              <%= cat.name %>
-            </option>
+    <% if (categories && categories.length) { %>
+      <section style="margin: 24px 0;">
+        <h2 style="margin-bottom: 12px;">Search by Category</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;">
+          <a href="/products" style="text-decoration:none;color:#222;border:1px solid #ddd;border-radius:10px;overflow:hidden;background:#fff;">
+            <img src="/images/default-product.jpg" alt="All categories" style="width:100%;height:110px;object-fit:cover;display:block;">
+            <div style="padding:8px 10px;font-weight:600;text-align:center;">All</div>
+          </a>
+
+          <% categories.forEach(category => { %>
+            <a href="/products?category=<%= category._id %>" style="text-decoration:none;color:#222;border:1px solid #ddd;border-radius:10px;overflow:hidden;background:#fff;">
+              <img src="<%= category.image || '/images/default-product.jpg' %>" alt="<%= category.name %>" style="width:100%;height:110px;object-fit:cover;display:block;">
+              <div style="padding:8px 10px;font-weight:600;text-align:center;"><%= category.name %></div>
+            </a>
           <% }) %>
-        </select>
-        <button type="submit" class="btn btn-secondary">Filter</button>
-      </form>
-    </div> -->
-    
+        </div>
+      </section>
+    <% } %>
+
     <div class="product-grid">
       <% products.forEach(product => { %>
         <div class="product-card">
-          <img src="<%= product.image %>" alt="<%= product.name %>">
+          <img src="<%= (product.images && product.images.length ? product.images[0] : product.image) %>" alt="<%= product.name %>">
           <h3><%= product.name %></h3>
-       <p class="category"><%= product.category ? product.category.name : 'No Category' %></p>
+          <p class="category"><%= product.category ? product.category.name : 'No Category' %></p>
 
           <p class="price">$<%= product.price.toFixed(2) %></p>
           <p class="stock">In stock: <%= product.stock %></p>
@@ -43,3 +45,4 @@
   </div>
 </body>
 </html>
+

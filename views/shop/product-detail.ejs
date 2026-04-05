@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= product.name %> - Fan Shop</title>
+    <title><%= product.name %> - Shop thương mại điện tử</title>
     <link rel="stylesheet" href="/css/style.css" />
 
     <style>
@@ -35,6 +35,26 @@
         object-fit: cover;
         border-radius: 12px;
         border: 1px solid #eee;
+      }
+
+      .thumb-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .thumb-list img {
+        width: 64px;
+        height: 64px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        cursor: pointer;
+      }
+
+      .thumb-list img.active {
+        border-color: #007bff;
       }
 
       .product-info h1 {
@@ -166,7 +186,21 @@
       <!-- PRODUCT INFO -->
       <div class="product-detail">
         <div class="product-image">
-          <img src="<%= product.image %>" alt="<%= product.name %>" />
+          <% const productImages = product.images && product.images.length ? product.images : [product.image]; %>
+          <img id="mainProductImage" src="<%= productImages[0] %>" alt="<%= product.name %>" />
+
+          <% if (productImages.length > 1) { %>
+            <div class="thumb-list">
+              <% productImages.forEach((img, index) => { %>
+                <img
+                  src="<%= img %>"
+                  alt="<%= product.name %> image <%= index + 1 %>"
+                  class="thumb-item <%= index === 0 ? 'active' : '' %>"
+                  onclick="changeMainImage(this, '<%= img %>')"
+                />
+              <% }) %>
+            </div>
+          <% } %>
         </div>
 
         <div class="product-info">
@@ -179,6 +213,7 @@
           <p class="description"><%= product.description %></p>
           <p class="stock">Available: <%= product.stock %> units</p>
           <p class="sold">Sold: <%= product.sold %> units</p>
+          <p class="views">Views: <%= product.viewCount || 0 %></p>
 
           <% if (product.stock > 0) { %>
           <form action="/cart/add" method="POST">
@@ -257,6 +292,18 @@
     </div>
 
     <script>
+      function changeMainImage(el, src) {
+        const main = document.getElementById("mainProductImage");
+        if (main) {
+          main.src = src;
+        }
+
+        document.querySelectorAll(".thumb-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+        el.classList.add("active");
+      }
+
       function toggleReply(id) {
         const box = document.getElementById("replyBox-" + id);
         box.style.display = box.style.display === "block" ? "none" : "block";
@@ -264,3 +311,4 @@
     </script>
   </body>
 </html>
+

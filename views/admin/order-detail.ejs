@@ -1,15 +1,16 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Details - Fan Shop</title>
+  <title>Order Details - Shop thương mại điện tử</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <%- include('../partials/navbar') %>
-  
-  <div class="container">
+  <div class="admin-shell">
+    <%- include('../partials/admin-sidebar') %>
+    <main class="admin-main">
+      <div class="container">
     <h1>Order #<%= order._id.toString().slice(-6) %></h1>
     
     <div class="order-detail">
@@ -63,6 +64,9 @@
     </table>
     
  
+      </div>
+    </main>
   </div>
 </body>
 </html>
+

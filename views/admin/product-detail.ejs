@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chi tiết sản phẩm - Shop thương mại điện tử</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 12px;
+        margin: 16px 0;
+      }
+
+      .detail-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 12px;
+        background: #fff;
+      }
+
+      .detail-card h4 {
+        margin: 0 0 8px;
+        font-size: 14px;
+        color: #4b5563;
+      }
+
+      .detail-card p {
+        margin: 0;
+        font-size: 15px;
+        color: #111827;
+        word-break: break-word;
+      }
+
+      .raw-box {
+        margin-top: 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #0f172a;
+        color: #e2e8f0;
+        padding: 14px;
+        overflow: auto;
+        max-height: 420px;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .top-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-shell">
+      <%- include('../partials/admin-sidebar') %>
+      <main class="admin-main">
+        <div class="container">
+          <h2>Chi tiết sản phẩm (dữ liệu thô)</h2>
+
+          <div class="top-actions">
+            <a href="/admin/products" class="btn btn-secondary"
+              >Quay lại danh sách</a
+            >
+            <a
+              href="/admin/products/edit/<%= product._id %>"
+              class="btn btn-primary"
+              >Sửa sản phẩm</a
+            >
+          </div>
+
+          <div class="detail-grid">
+            <div class="detail-card">
+              <h4>ID</h4>
+              <p><%= String(product._id) %></p>
+            </div>
+            <div class="detail-card">
+              <h4>Tên</h4>
+              <p><%= product.name %></p>
+            </div>
+            <div class="detail-card">
+              <h4>Danh mục</h4>
+              <p><%= product.category ? product.category.name : '-' %></p>
+            </div>
+            <div class="detail-card">
+              <h4>Giá</h4>
+              <p>$<%= Number(product.price || 0).toFixed(2) %></p>
+            </div>
+            <div class="detail-card">
+              <h4>Tồn kho</h4>
+              <p><%= product.stock || 0 %></p>
+            </div>
+            <div class="detail-card">
+              <h4>Đã bán</h4>
+              <p><%= product.sold || 0 %></p>
+            </div>
+            <div class="detail-card">
+              <h4>Lượt xem</h4>
+              <p><%= product.viewCount || 0 %></p>
+            </div>
+            <div class="detail-card">
+              <h4>Home Order</h4>
+              <p><%= product.homeOrder ?? 9999 %></p>
+            </div>
+            <div class="detail-card">
+              <h4>Embedding length</h4>
+              <p><%= embeddingLength %></p>
+            </div>
+            <div class="detail-card">
+              <h4>createdAt</h4>
+              <p>
+                <%= product.createdAt ? new
+                Date(product.createdAt).toISOString() : '-' %>
+              </p>
+            </div>
+            <div class="detail-card">
+              <h4>updatedAt</h4>
+              <p>
+                <%= product.updatedAt ? new
+                Date(product.updatedAt).toISOString() : '-' %>
+              </p>
+            </div>
+            <div class="detail-card">
+              <h4>Ảnh chính</h4>
+              <p><%= product.image || '-' %></p>
+            </div>
+          </div>
+
+          <h3>Dữ liệu JSON thô</h3>
+          <pre class="raw-box"><%= rawProductJson %></pre>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

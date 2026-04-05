@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Banners - Shop thương mại điện tử</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <%- include('../partials/admin-sidebar') %>
+    <main class="admin-main">
+      <div class="container">
+        <div class="page-header">
+          <h1>Manage Banners</h1>
+          <a href="/admin/banners/add" class="btn btn-primary">Add New Banner</a>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Title</th>
+              <th>Link</th>
+              <th>Order</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% banners.forEach(banner => { %>
+              <tr>
+                <td>
+                  <img
+                    src="<%= banner.image || '/images/banner.png' %>"
+                    alt="<%= banner.title %>"
+                    class="product-thumb"
+                  >
+                </td>
+                <td><%= banner.title %></td>
+                <td><%= banner.link %></td>
+                <td><%= banner.sortOrder %></td>
+                <td>
+                  <% if (banner.isActive) { %>
+                    <span class="status-badge success">Active</span>
+                  <% } else { %>
+                    <span class="status-badge warning">Hidden</span>
+                  <% } %>
+                </td>
+                <td class="actions">
+                  <a href="/admin/banners/edit/<%= banner._id %>" class="btn btn-sm btn-secondary">Edit</a>
+
+                  <form action="/admin/banners/toggle/<%= banner._id %>" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-info">
+                      <%= banner.isActive ? 'Hide' : 'Show' %>
+                    </button>
+                  </form>
+
+                  <form action="/admin/banners/delete/<%= banner._id %>" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this banner?')">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+
+            <% if (banners.length === 0) { %>
+              <tr>
+                <td colspan="6" class="text-center">No banner yet</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+

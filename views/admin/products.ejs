@@ -1,56 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manage Products - Fan Shop</title>
+  <title>Quản lý sản phẩm - Shop thương mại điện tử</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <%- include('../partials/navbar') %>
-  
-  <div class="container">
+  <div class="admin-shell">
+    <%- include('../partials/admin-sidebar') %>
+    <main class="admin-main">
+      <div class="container">
     <div class="page-header">
-
-      <a href="/admin/products/add" class="btn btn-primary">Add New Product</a>
+      <h2>Quản lý sản phẩm</h2>
+      
+      <a href="/admin/products/add" class="btn btn-primary">Thêm sản phẩm mới</a>
     </div>
-    
+
     <form action="/admin/products" method="GET" class="search-form">
-      <input type="text" name="search" placeholder="Search products..." value="<%= search %>">
-      <button type="submit" class="btn btn-secondary">Search</button>
+      <input type="text" name="search" placeholder="Tìm sản phẩm..." value="<%= search %>">
+      <select name="sortBy">
+        <option value="homeOrder" <%= sortBy === 'homeOrder' ? 'selected' : '' %>>Sắp xếp trang chủ (homeOrder)</option>
+        <option value="viewCount" <%= sortBy === 'viewCount' ? 'selected' : '' %>>Lượt xem (viewCount)</option>
+        <option value="sold" <%= sortBy === 'sold' ? 'selected' : '' %>>Đã bán (sold)</option>
+      </select>
+      <select name="sortOrder">
+        <option value="desc" <%= sortOrder === 'desc' ? 'selected' : '' %>>Giảm dần</option>
+        <option value="asc" <%= sortOrder === 'asc' ? 'selected' : '' %>>Tăng dần</option>
+      </select>
+      <button type="submit" class="btn btn-secondary">Áp dụng</button>
     </form>
     
     <table class="data-table">
       <thead>
         <tr>
-          <th>Image</th>
-          <th>Name</th>
-          <th>Category</th>
-          <th>Price</th>
-          <th>Stock</th>
-          <th>Sold</th>
-          <th>Actions</th>
+          <th>Ảnh</th>
+          <th>Tên</th>
+          <th>Danh mục</th>
+          <th>Giá</th>
+          <th>Tồn kho</th>
+          <th>Đã bán</th>
+          <th>Lượt xem</th>
+          <th>Thứ tự trang chủ</th>
+          <th>Màu sắc</th>
+          <th>Kích thước</th>
+          <th>Tags</th>
+          <th>Search Text</th>
+          <th>Thao tác</th>
         </tr>
       </thead>
       <tbody>
         <% products.forEach(product => { %>
           <tr>
-            <td><img src="<%= product.image %>" alt="<%= product.name %>" class="product-thumb"></td>
+            <td>
+              <img
+                src="<%= (product.images && product.images.length ? product.images[0] : product.image) %>"
+                alt="<%= product.name %>"
+                class="product-thumb"
+              >
+              <div style="font-size:12px;color:#666;">Số ảnh: <%= product.images && product.images.length ? product.images.length : 1 %></div>
+            </td>
             <td><%= product.name %></td>
-            <td><%= product.category.name %></td>
+            <td><%= product.category ? product.category.name : '-' %></td>
             <td>$<%= product.price.toFixed(2) %></td>
             <td><%= product.stock %></td>
             <td><%= product.sold %></td>
+            <td><%= product.viewCount || 0 %></td>
+            <td><%= product.homeOrder ?? 9999 %></td>
+            <td><%= product.color && product.color.length ? product.color.join(', ') : '-' %></td>
+            <td><%= product.size && product.size.length ? product.size.join(', ') : '-' %></td>
+            <td><%= product.tags && product.tags.length ? product.tags.join(', ') : '-' %></td>
+            <td style="max-width:220px;word-break:break-word;"><%= product.searchText || '-' %></td>
             <td class="actions">
-              <a href="/admin/products/edit/<%= product._id %>" class="btn btn-sm btn-secondary">Edit</a>
+              <a href="/admin/products/detail/<%= product._id %>" class="btn btn-sm btn-secondary">Chi tiết</a>
+              <a href="/admin/products/edit/<%= product._id %>" class="btn btn-sm btn-secondary">Sửa</a>
               <form action="/admin/products/delete/<%= product._id %>" method="POST" style="display: inline;">
-                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">Xóa</button>
               </form>
             </td>
           </tr>
         <% }) %>
       </tbody>
     </table>
+      </div>
+    </main>
   </div>
 </body>
 </html>
+

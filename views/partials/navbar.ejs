@@ -1,12 +1,12 @@
-<nav class="main-header">
+﻿<nav class="main-header">
   <div class="header-container">
     <!-- LOGO -->
-    <a href="/" class="logo"> Shop Thương Mại Điện tử </a>
+    <a href="/" class="logo">Shop thương mại điện tử</a>
 
     <!-- SEARCH -->
     <div class="search-wrapper">
-      <!-- Đổi từ <form> sang <div> để dễ control overflow -->
-      <input id="search-input" placeholder="Tìm kiếm quạt mát..." />
+      <!-- Äá»•i tá»« <form> sang <div> Ä‘á»ƒ dá»… control overflow -->
+      <input id="search-input" placeholder="Tìm kiếm sản phẩm..." />
       <button>Search</button>
       <div id="ai-suggest-box"></div>
     </div>
@@ -36,16 +36,16 @@
   </div>
 </nav>
 
-<!-- STYLE - ĐÃ FIX ĐỂ DROPDOWN HIỆN CHẮC CHẮN -->
+<!-- STYLE - ÄÃƒ FIX Äá»‚ DROPDOWN HIá»†N CHáº®C CHáº®N -->
 <style>
   .main-header {
     background-color: #ee4d2d;
     position: sticky;
     top: 0;
-    z-index: 1000; /* Không quá cao để tránh conflict */
+    z-index: 1000; /* KhÃ´ng quÃ¡ cao Ä‘á»ƒ trÃ¡nh conflict */
     width: 100%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: visible !important; /* Quan trọng */
+    overflow: visible !important; /* Quan trá»ng */
   }
 
   .header-container {
@@ -55,7 +55,7 @@
     display: flex;
     align-items: center;
     padding: 0 20px;
-    position: relative; /* Tạo context nếu cần */
+    position: relative; /* Táº¡o context náº¿u cáº§n */
     overflow: visible !important;
   }
 
@@ -68,16 +68,16 @@
     white-space: nowrap;
   }
 
-  /* SEARCH WRAPPER - CHA TRỰC TIẾP CỦA DROPDOWN */
+  /* SEARCH WRAPPER - CHA TRá»°C TIáº¾P Cá»¦A DROPDOWN */
   .search-wrapper {
-    position: relative !important; /* BẮT BUỘC: absolute tính từ đây */
+    position: relative !important; /* Báº®T BUá»˜C: absolute tÃ­nh tá»« Ä‘Ã¢y */
     flex: 1;
     max-width: 580px;
     display: flex;
     background: #fff;
     border-radius: 6px;
-    overflow: visible !important; /* KHÔNG ĐƯỢC hidden */
-    z-index: 10; /* Để nổi hơn các phần khác nếu cần */
+    overflow: visible !important; /* KHÃ”NG ÄÆ¯á»¢C hidden */
+    z-index: 10; /* Äá»ƒ ná»•i hÆ¡n cÃ¡c pháº§n khÃ¡c náº¿u cáº§n */
   }
 
   .search-wrapper input {
@@ -107,7 +107,7 @@
     background: #e03e24;
   }
 
-  /* DROPDOWN - ÉP HIỆN */
+  /* DROPDOWN - Ã‰P HIá»†N */
   #ai-suggest-box {
     position: absolute !important;
     top: 100% !important;
@@ -120,8 +120,8 @@
     margin-top: 4px !important;
     max-height: 400px;
     overflow-y: auto;
-    z-index: 999999 !important; /* Siêu cao để vượt mọi thứ */
-    display: none; /* Ban đầu ẩn */
+    z-index: 999999 !important; /* SiÃªu cao Ä‘á»ƒ vÆ°á»£t má»i thá»© */
+    display: none; /* Ban Ä‘áº§u áº©n */
     visibility: visible !important;
   }
 
@@ -134,7 +134,7 @@
     border-radius: 3px;
   }
 
-  /* Các class còn lại giữ nguyên, nhưng thêm !important nếu cần */
+  /* CÃ¡c class cÃ²n láº¡i giá»¯ nguyÃªn, nhÆ°ng thÃªm !important náº¿u cáº§n */
   .suggest-item {
     display: flex;
     align-items: center;
@@ -143,10 +143,11 @@
     color: #333;
     border-bottom: 1px solid #f5f5f5;
     transition: background 0.15s;
+    cursor: pointer;
   }
 
   .suggest-item:hover {
-    background: #f8f8f8;
+    background: linear-gradient(90deg, #fffaf9 0%, #fff 100%);
   }
 
   .suggest-item img {
@@ -159,18 +160,135 @@
 
   .suggest-info {
     flex: 1;
+    min-width: 0;
+  }
+
+  .suggest-topline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .suggest-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+  }
+
+  .badge-search {
+    background: linear-gradient(135deg, #ffedd9, #ffd3c4);
+    color: #a5341f;
+    border: 1px solid #ffc4ad;
+  }
+
+  .badge-viewed {
+    background: linear-gradient(135deg, #e4f7ec, #c8efdb);
+    color: #1f6b48;
+    border: 1px solid #b5e4cc;
   }
 
   .suggest-name {
     font-size: 15px;
-    font-weight: 500;
-    margin-bottom: 4px;
+    font-weight: 700;
+    margin-bottom: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .suggest-price {
-    font-size: 15px;
+    font-size: 13px;
+    color: #3a3a3a;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .suggest-meta {
+    font-size: 12px;
+    color: #777;
+    margin-top: 2px;
+  }
+
+  .suggest-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f1f1;
+    background: linear-gradient(180deg, #fff7f3, #fffdfc);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .suggest-actions-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #7a4b3f;
+  }
+
+  .suggest-actions-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .suggest-clear {
+    border: 1px solid #ffcab8;
+    background: #fff;
+    color: #d54a2e;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .suggest-confirm-btn {
+    border: 1px solid #ffcab8;
+    background: #fff;
+    color: #d54a2e;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .suggest-confirm-btn.confirm {
+    background: #ee4d2d;
+    border-color: #ee4d2d;
+    color: #fff;
+  }
+
+  .suggest-remove {
+    margin-left: 8px;
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: #fff1ef;
     color: #ee4d2d;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .suggest-empty-tip {
+    padding: 12px;
+    text-align: center;
+    color: #777;
+    font-size: 12px;
   }
 
   .stock {
@@ -187,7 +305,7 @@
     color: #757575;
   }
 
-  /* Nav menu giữ nguyên */
+  /* Nav menu giá»¯ nguyÃªn */
   .nav-menu {
     list-style: none;
     display: flex;
@@ -221,64 +339,246 @@
   }
 </style>
 
-<!-- SCRIPT - Giữ nguyên như lần trước, đã có debug log -->
+<!-- SCRIPT - Giá»¯ nguyÃªn nhÆ° láº§n trÆ°á»›c, Ä‘Ã£ cÃ³ debug log -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const input = document.getElementById("search-input");
+    const searchBtn = document.querySelector(".search-wrapper button");
     const suggestBox = document.getElementById("ai-suggest-box");
+    let debounceTimer = null;
+    let clearConfirmMode = false;
 
     if (!input || !suggestBox) {
       console.error("Element missing");
       return;
     }
 
-    console.log("Search script OK");
+    function escapeHtml(value = "") {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
-    input.addEventListener("focus", loadSuggest);
+    function runKeywordSearch(keyword) {
+      const q = String(keyword || "").trim();
+      if (!q) return;
+      window.location.href = `/products?search=${encodeURIComponent(q)}`;
+    }
 
-    async function loadSuggest() {
-      console.log("Đang tải gợi ý...");
+    async function deleteOneKeyword(keyword) {
+      const q = String(keyword || "").trim();
+      if (!q) return;
+
+      const res = await fetch(
+        `/api/ai-search/history?keyword=${encodeURIComponent(q)}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error(`Delete API ${res.status}`);
+      }
+    }
+
+    async function clearAllKeywords() {
+      const res = await fetch(`/api/ai-search/history/all`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error(`Clear API ${res.status}`);
+      }
+    }
+
+    async function loadSuggest(keyword = "") {
       try {
-        const res = await fetch("/api/ai-suggest");
+        const res = await fetch(
+          `/api/ai-search/history?q=${encodeURIComponent(keyword)}`
+        );
         if (!res.ok) throw new Error(`API ${res.status}`);
         const data = await res.json();
-        console.log("Dữ liệu:", data);
+        const suggestions = Array.isArray(data?.suggestions)
+          ? data.suggestions
+          : [];
 
-        if (!data?.length) {
+        if (!suggestions.length) {
           suggestBox.style.display = "none";
           return;
         }
 
-        suggestBox.innerHTML = data
-          .map(
-            (p) => `
-          <a href="/products/${p._id}" class="suggest-item">
-            <img src="${p.image || "/images/no-image.png"}" alt="${p.name}">
-            <div class="suggest-info">
-              <div class="suggest-name">${p.name}</div>
-              <div class="suggest-price">${Number(p.price).toLocaleString(
-                "vi-VN"
-              )} ₫</div>
-              <div>
-                </div>
+        const hasSearchSuggestions = suggestions.some(
+          (item) => item.type === "search"
+        );
 
-              <!-- <p class="stock ${p.stock <= 0 ? "zero" : ""}">
-                ${p.stock > 0 ? `Available: ${p.stock} units` : "Hết hàng"}
-              </p>
-              <p class="sold">Sold: ${p.sold || 0} units</p> -->
+        const headerHtml = hasSearchSuggestions
+          ? `<div class="suggest-actions">
+               <div class="suggest-actions-title">Goi y gan day</div>
+               <div class="suggest-actions-right">
+                 ${
+                   clearConfirmMode
+                     ? `<button type="button" class="suggest-confirm-btn" data-role="cancel-clear">Huy</button>
+                        <button type="button" class="suggest-confirm-btn confirm" data-role="confirm-clear">Xac nhan xoa</button>`
+                     : `<button type="button" class="suggest-clear" data-role="clear-all">Xoa tat ca</button>`
+                 }
+               </div>
+             </div>`
+          : "";
+
+        const listHtml = suggestions
+          .map(
+            (item) => `
+          <div
+            class="suggest-item"
+            data-type="${escapeHtml(item.type || "search") }"
+            data-keyword="${escapeHtml(item.keyword || "") }"
+            data-product-id="${escapeHtml(item.product?._id || "") }"
+          >
+            <img src="${item.product?.image || "/images/no-image.png"}" alt="${escapeHtml(item.product?.name || item.keyword || "goi y")}">
+            <div class="suggest-info">
+              <div class="suggest-topline">
+                <span class="suggest-badge ${
+                  item.type === "viewed" ? "badge-viewed" : "badge-search"
+                }">${item.type === "viewed" ? "Da xem" : "Lich su tim kiem"}</span>
+                <div class="suggest-name">${
+                  item.type === "viewed"
+                    ? escapeHtml(item.product?.name || "San pham da xem")
+                    : escapeHtml(item.keyword || "")
+                }</div>
+              </div>
+              <div class="suggest-price">${
+                item.product?.name
+                  ? escapeHtml(item.product.name)
+                  : "Tu khoa da tim gan day"
+              }</div>
+              <div class="suggest-meta">${
+                item.type === "viewed"
+                  ? "Mo lai san pham da xem"
+                  : "Nhan de tim lai tu khoa"
+              }</div>
             </div>
-          </a>
+            ${
+              item.type === "search"
+                ? `<button type="button" class="suggest-remove" data-role="remove-keyword" data-keyword="${escapeHtml(
+                    item.keyword || ""
+                  )}">X</button>`
+                : ""
+            }
+          </div>
         `
           )
           .join("");
 
+        suggestBox.innerHTML = `${headerHtml}${listHtml}`;
+
+        if (!listHtml.trim()) {
+          suggestBox.innerHTML = `${headerHtml}<div class="suggest-empty-tip">Khong co du lieu goi y trong 7 ngay gan day</div>`;
+        }
+
         suggestBox.style.display = "block";
-        console.log("Hiển thị OK");
       } catch (err) {
-        console.error("Lỗi:", err);
+        console.error("Lá»—i:", err);
         suggestBox.style.display = "none";
       }
     }
+
+    input.addEventListener("focus", () => {
+      clearConfirmMode = false;
+      loadSuggest(input.value);
+    });
+    input.addEventListener("input", () => {
+      clearConfirmMode = false;
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        loadSuggest(input.value);
+      }, 250);
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        runKeywordSearch(input.value);
+      }
+    });
+
+    if (searchBtn) {
+      searchBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        runKeywordSearch(input.value);
+      });
+    }
+
+    suggestBox.addEventListener("click", async (event) => {
+      const removeBtn = event.target.closest('[data-role="remove-keyword"]');
+      if (removeBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const keyword = removeBtn.getAttribute("data-keyword") || "";
+        try {
+          await deleteOneKeyword(keyword);
+          await loadSuggest(input.value);
+        } catch (err) {
+          console.error("Xoa keyword that bai:", err);
+        }
+        return;
+      }
+
+      const clearAllBtn = event.target.closest('[data-role="clear-all"]');
+      if (clearAllBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        clearConfirmMode = true;
+        await loadSuggest(input.value);
+        return;
+      }
+
+      const cancelClearBtn = event.target.closest('[data-role="cancel-clear"]');
+      if (cancelClearBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        clearConfirmMode = false;
+        await loadSuggest(input.value);
+        return;
+      }
+
+      const confirmClearBtn = event.target.closest('[data-role="confirm-clear"]');
+      if (confirmClearBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        try {
+          await clearAllKeywords();
+          clearConfirmMode = false;
+          await loadSuggest(input.value);
+        } catch (err) {
+          console.error("Xoa toan bo lich su that bai:", err);
+        }
+        return;
+      }
+
+      const item = event.target.closest(".suggest-item");
+      if (!item) return;
+
+      const type = item.getAttribute("data-type") || "search";
+      const keyword = item.getAttribute("data-keyword") || "";
+      const productId = item.getAttribute("data-product-id") || "";
+
+      suggestBox.style.display = "none";
+
+      if (type === "viewed" && productId) {
+        window.location.href = `/products/${encodeURIComponent(productId)}`;
+        return;
+      }
+
+      input.value = keyword;
+      runKeywordSearch(keyword);
+    });
 
     document.addEventListener("click", (e) => {
       if (!e.target.closest(".search-wrapper")) {
@@ -287,3 +587,4 @@
     });
   });
 </script>
+

@@ -1,11 +1,12 @@
-const express = require("express");
+﻿const express = require("express");
 const axios = require("axios");
-const mongoose = require("mongoose"); // ← THÊM DÒNG NÀY ĐỂ FIX LỖI
+const mongoose = require("mongoose");
 
 const router = express.Router();
 
 const Product = require("../models/Product");
 const Category = require("../models/Category");
+const Banner = require("../models/Banner");
 const Comment = require("../models/Comment");
 const UserHistory = require("../models/UserHistory");
 const Order = require("../models/Order");
@@ -20,21 +21,47 @@ router.get("/", async (req, res) => {
     const userId = req.session?.userId?.toString() || req.query.userId || null;
     console.log("User ID:", userId || "(anonymous)");
 
-    const [topProducts, latestProducts, categories] = await Promise.all([
-      Product.find()
-        .populate("category", "name")
-        .sort({ sold: -1 })
-        .limit(8)
-        .lean(),
+    const [topProducts, latestProducts, categories, banners] =
+      await Promise.all([
+        Product.find()
+          .populate("category", "name")
+          .sort({ sold: -1 })
+          .limit(8)
+          .lean(),
 
-      Product.find()
-        .populate("category", "name")
-        .sort({ createdAt: -1 })
-        .limit(12)
-        .lean(),
+        Product.find()
+          .populate("category", "name")
+          .sort({ homeOrder: 1, createdAt: -1 })
+          .limit(12)
+          .lean(),
 
-      Category.find().select("name slug").lean(),
-    ]);
+        Category.find().select("name image").lean(),
+
+        Banner.find({ isActive: true })
+          .sort({ sortOrder: 1, createdAt: -1 })
+          .lean(),
+      ]);
+
+    const fallbackBanners = topProducts.slice(0, 5).map((product) => ({
+      image:
+        product.images && product.images.length
+          ? product.images[0]
+          : product.image || "/images/banner.png",
+      title: product.name,
+      description: product.description
+        ? product.description.slice(0, 90)
+        : "San pham chinh hang - mua sam thong minh",
+      link: `/products/${product._id}`,
+    }));
+
+    const heroBanners = banners.length
+      ? banners.map((banner) => ({
+          image: banner.image || "/images/banner.png",
+          title: banner.title,
+          description: banner.description,
+          link: banner.link || "/products",
+        }))
+      : fallbackBanners;
 
     let recommendedProducts = [];
 
@@ -43,7 +70,7 @@ router.get("/", async (req, res) => {
         console.log(`Calling recommendation service for user ${userId}...`);
         const { data, status } = await axios.get(
           `http://127.0.0.1:5000/recommend/${userId}`,
-          { timeout: 5000 }
+          { timeout: 5000 },
         );
 
         console.log(`AI response status: ${status}`);
@@ -69,13 +96,14 @@ router.get("/", async (req, res) => {
       topProducts,
       products: latestProducts,
       categories,
+      heroBanners,
       recommendedProducts,
       hasRecommendations: recommendedProducts.length > 0,
       pageTitle: "Trang chủ - Cửa hàng",
     });
   } catch (error) {
     console.error("HOME ROUTE CRITICAL ERROR:", error);
-    res.status(500).render("errors/500", {
+    res.status(500).render("error", {
       message: "Có lỗi xảy ra. Vui lòng thử lại sau.",
       error: process.env.NODE_ENV === "development" ? error : null,
     });
@@ -104,7 +132,7 @@ router.get("/products", async (req, res) => {
       try {
         const response = await axios.get(
           `http://127.0.0.1:5000/recommend/${req.session.userId}`,
-          { timeout: 5000 }
+          { timeout: 5000 },
         );
         if (Array.isArray(response.data)) {
           recommendedProducts = response.data;
@@ -124,19 +152,17 @@ router.get("/products", async (req, res) => {
     });
   } catch (error) {
     console.error("PRODUCTS PAGE ERROR:", error);
-    res
-      .status(500)
-      .render("errors/500", { message: "Lỗi tải danh sách sản phẩm" });
+    res.status(500).render("error", { message: "Lỗi tải danh sách sản phẩm" });
   }
 });
 router.get("/api/ai-suggest", async (req, res) => {
   try {
     if (!req.session?.userId) return res.json([]);
 
-    // gọi AI service
+    // gá»i AI service
     const response = await axios.get(
       `http://127.0.0.1:5000/recommend/${req.session.userId}`,
-      { timeout: 5000 }
+      { timeout: 5000 },
     );
 
     const recommendedIds = response.data;
@@ -145,7 +171,7 @@ router.get("/api/ai-suggest", async (req, res) => {
       return res.json([]);
     }
 
-    // lấy product từ MongoDB
+    // láº¥y product tá»« MongoDB
     const products = await Product.find({
       _id: { $in: recommendedIds },
     })
@@ -163,82 +189,88 @@ router.get("/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1. Kiểm tra ID hợp lệ
+    // 1. Kiá»ƒm tra ID há»£p lá»‡
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).render("errors/400", {
+      return res.status(400).render("error", {
         message: "ID sản phẩm không hợp lệ",
       });
     }
 
-    // 2. Tìm sản phẩm + populate category (lấy tên category)
+    // 2. TÃ¬m sáº£n pháº©m + populate category (láº¥y tÃªn category)
     const product = await Product.findById(id)
-      .populate("category", "name") // populate tên category để hiển thị
-      .lean(); // dùng lean để nhanh hơn khi chỉ hiển thị
+      .populate("category", "name") // populate tÃªn category Ä‘á»ƒ hiá»ƒn thá»‹
+      .lean(); // dÃ¹ng lean Ä‘á»ƒ nhanh hÆ¡n khi chá»‰ hiá»ƒn thá»‹
 
     if (!product) {
-      return res.status(404).render("errors/404", {
+      return res.status(404).render("error", {
         message: "Không tìm thấy sản phẩm",
       });
     }
 
-    // 3. LƯU LỊCH SỬ XEM VÀO USERHISTORY (chỉ khi đã đăng nhập)
-    // Mỗi lần xem tạo 1 record riêng (như anh yêu cầu)
+    await Product.findByIdAndUpdate(id, { $inc: { viewCount: 1 } });
+    product.viewCount = (product.viewCount || 0) + 1;
+
+    // 3. LÆ¯U Lá»ŠCH Sá»¬ XEM VÃ€O USERHISTORY (chá»‰ khi Ä‘Ã£ Ä‘Äƒng nháº­p)
+    // Má»—i láº§n xem táº¡o 1 record riÃªng (nhÆ° anh yÃªu cáº§u)
     if (req.session?.userId) {
       try {
         await UserHistory.create({
           user: req.session.userId,
           product: product._id,
           action: "view",
-          // createdAt sẽ tự động set theo default trong schema
+          // createdAt sáº½ tá»± Ä‘á»™ng set theo default trong schema
         });
 
-        // Log để debug (có thể comment khi production)
+        // Log Ä‘á»ƒ debug (cÃ³ thá»ƒ comment khi production)
         console.log(
-          `[HISTORY] Đã lưu view: user ${req.session.userId} → product ${product._id}`
+          `[HISTORY] ÄÃ£ lÆ°u view: user ${req.session.userId} â†’ product ${product._id}`,
         );
       } catch (historyErr) {
-        console.error("[HISTORY ERROR] Lưu view thất bại:", historyErr.message);
-        // Không throw → vẫn render trang bình thường
+        console.error(
+          "[HISTORY ERROR] LÆ°u view tháº¥t báº¡i:",
+          historyErr.message,
+        );
+        // KhÃ´ng throw â†’ váº«n render trang bÃ¬nh thÆ°á»ng
       }
     } else {
       console.log("[HISTORY] Không lưu view: người dùng chưa đăng nhập");
     }
 
-    // 4. Lấy comments + replies
+    // 4. Láº¥y comments + replies
     const allComments = await Comment.find({ product: id })
-      .populate("user", "fullName avatar") // populate tên + avatar người comment
+      .populate("user", "fullName avatar") // populate tÃªn + avatar ngÆ°á»i comment
       .sort({ createdAt: 1 })
       .lean();
 
     const comments = allComments.filter((c) => !c.parentComment);
     const replies = allComments.filter((c) => c.parentComment);
 
-    // Gắn replies vào comment cha
+    // Gáº¯n replies vÃ o comment cha
     comments.forEach((c) => {
       c.replies = replies.filter(
-        (r) => String(r.parentComment) === String(c._id)
+        (r) => String(r.parentComment) === String(c._id),
       );
     });
 
-    // 5. Gọi AI recommend (nếu người dùng đã đăng nhập)
+    // 5. Gá»i AI recommend (náº¿u ngÆ°á»i dÃ¹ng Ä‘Ã£ Ä‘Äƒng nháº­p)
     let recommendedProducts = [];
 
     if (req.session?.userId) {
       try {
         const response = await axios.get(
           `http://127.0.0.1:5000/recommend/${req.session.userId}`,
-          { timeout: 5000 } // tránh treo nếu Flask chậm
+          { timeout: 5000 }, // trÃ¡nh treo náº¿u Flask cháº­m
         );
 
         if (Array.isArray(response.data) && response.data.length > 0) {
           recommendedProducts = response.data;
           console.log(
-            `[RECOMMEND] Nhận được ${recommendedProducts.length} sản phẩm gợi ý`
+            `[RECOMMEND] Nháº­n Ä‘Æ°á»£c ${recommendedProducts.length} sáº£n pháº©m gá»£i Ã½`,
           );
         } else {
           console.log(
             "[RECOMMEND] AI trả về dữ liệu không hợp lệ hoặc rỗng:",
-            response.data
+            response.data,
           );
         }
       } catch (aiErr) {
@@ -246,24 +278,24 @@ router.get("/products/:id", async (req, res) => {
           message: aiErr.message,
           status: aiErr.response?.status,
         });
-        // Không throw → vẫn render trang
+        // KhÃ´ng throw â†’ váº«n render trang
       }
     }
 
-    // 6. Render trang chi tiết sản phẩm
+    // 6. Render trang chi tiáº¿t sáº£n pháº©m
     res.render("shop/product-detail", {
       user: req.session || null,
       product,
       comments,
       recommendedProducts,
-      // Các biến hỗ trợ giao diện (tùy chọn)
-      pageTitle: `${product.name} - Fan Shop`,
+      // CÃ¡c biáº¿n há»— trá»£ giao diá»‡n (tÃ¹y chá»n)
+      pageTitle: `${product.name} - Shop thương mại điện tử`,
       hasComments: comments.length > 0,
       hasRecommendations: recommendedProducts.length > 0,
     });
   } catch (error) {
     console.error("[PRODUCT DETAIL] Lỗi nghiêm trọng:", error);
-    res.status(500).render("errors/500", {
+    res.status(500).render("error", {
       message: "Có lỗi xảy ra khi tải chi tiết sản phẩm. Vui lòng thử lại sau.",
     });
   }
@@ -296,21 +328,21 @@ router.post("/cart/add", isAuthenticated, async (req, res) => {
 
     if (!product) return res.redirect("/products");
 
-    // Lưu history "add to cart" (nếu muốn phân biệt với view)
+    // LÆ°u history "add to cart" (náº¿u muá»‘n phÃ¢n biá»‡t vá»›i view)
     if (req.session?.userId) {
       await UserHistory.create({
         user: req.session.userId,
         product: product._id,
         action: "add_to_cart",
       }).catch((err) =>
-        console.error("History add_to_cart error:", err.message)
+        console.error("History add_to_cart error:", err.message),
       );
     }
 
     if (!req.session.cart) req.session.cart = [];
 
     const existing = req.session.cart.find(
-      (item) => item.productId === productId
+      (item) => item.productId === productId,
     );
     if (existing) {
       existing.quantity += Number.parseInt(quantity) || 1;
@@ -364,7 +396,7 @@ router.post("/cart/remove", isAuthenticated, (req, res) => {
   try {
     const { productId } = req.body;
     req.session.cart = (req.session.cart || []).filter(
-      (item) => item.productId !== productId
+      (item) => item.productId !== productId,
     );
     res.redirect("/cart");
   } catch (error) {
@@ -383,7 +415,7 @@ router.get("/checkout", isAuthenticated, async (req, res) => {
     const user = await User.findById(req.session.userId).lean();
     const total = cart.reduce(
       (sum, item) => sum + item.price * item.quantity,
-      0
+      0,
     );
 
     res.render("shop/checkout", {
@@ -424,7 +456,7 @@ router.post("/checkout", isAuthenticated, async (req, res) => {
 
     const totalAmount = items.reduce(
       (sum, item) => sum + item.price * item.quantity,
-      0
+      0,
     );
 
     const order = new Order({
@@ -436,7 +468,7 @@ router.post("/checkout", isAuthenticated, async (req, res) => {
 
     await order.save();
 
-    // Lưu history purchase
+    // LÆ°u history purchase
     for (const item of items) {
       await UserHistory.create({
         user: req.session.userId,
@@ -562,7 +594,7 @@ router.post("/profile", isAuthenticated, async (req, res) => {
           success: null,
         });
       }
-      user.password = newPassword; // giả định model tự hash
+      user.password = newPassword; // giáº£ Ä‘á»‹nh model tá»± hash
     }
 
     await user.save();

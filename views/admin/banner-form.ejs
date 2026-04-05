@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= banner ? 'Edit' : 'Add' %> Banner - Shop thương mại điện tử</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <%- include('../partials/admin-sidebar') %>
+    <main class="admin-main">
+      <div class="container">
+        <h1><%= banner ? 'Edit' : 'Add New' %> Banner</h1>
+
+        <% if (error) { %>
+          <div class="alert alert-error"><%= error %></div>
+        <% } %>
+
+        <form action="<%= banner ? `/admin/banners/edit/${banner._id}` : '/admin/banners/add' %>" method="POST" enctype="multipart/form-data" class="form">
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" value="<%= banner ? banner.title : '' %>" required>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="3"><%= banner ? banner.description : '' %></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="link">Link</label>
+            <input type="text" id="link" name="link" value="<%= banner ? banner.link : '/products' %>">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sortOrder">Sort Order</label>
+              <input type="number" id="sortOrder" name="sortOrder" value="<%= banner ? banner.sortOrder : 0 %>">
+            </div>
+
+            <div class="form-group">
+              <label for="isActive">Status</label>
+              <select id="isActive" name="isActive">
+                <option value="true" <%= !banner || banner.isActive ? 'selected' : '' %>>Active</option>
+                <option value="false" <%= banner && !banner.isActive ? 'selected' : '' %>>Hidden</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="image">Banner Image</label>
+            <% if (banner && banner.image) { %>
+              <img src="<%= banner.image %>" alt="Current banner image" class="current-image">
+            <% } %>
+            <input type="file" id="image" name="image" accept="image/*" <%= banner ? '' : 'required' %>>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary"><%= banner ? 'Update' : 'Add' %> Banner</button>
+            <a href="/admin/banners" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+

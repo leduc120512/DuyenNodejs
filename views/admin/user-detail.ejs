@@ -1,15 +1,16 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Detail - Fan Shop</title>
+  <title>User Detail - Shop thương mại điện tử</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <%- include('../partials/navbar') %>
-  
-  <div class="container">
+  <div class="admin-shell">
+    <%- include('../partials/admin-sidebar') %>
+    <main class="admin-main">
+      <div class="container">
     <div class="page-header">
       <h1>User: <%= targetUser.username %></h1>
       <a href="/admin/users" class="btn btn-secondary">Back to List</a>
@@ -95,6 +96,8 @@
         <% } %>
       </table>
     </div>
+      </div>
+    </main>
   </div>
 </body>
 </html>

@@ -1,42 +1,291 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - Fan Shop</title>
-  <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-  <%- include('../partials/navbar') %>
-  
-  <div class="container">
+﻿<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bảng điều khiển quản trị - Shop thương mại điện tử</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <%- include('../partials/admin-sidebar') %>
+      <main class="admin-main">
+        <div class="container">
+          <h2>Bảng điều khiển quản trị</h2>
 
-    
-    <div class="dashboard-stats">
-      <div class="stat-card">
-        <h3>Total Products</h3>
-        <p class="stat-number"><%= productCount %></p>
-      </div>
-      <div class="stat-card">
-        <h3>Categories</h3>
-        <p class="stat-number"><%= categoryCount %></p>
-      </div>
-      <div class="stat-card">
-        <h3>Total Orders</h3>
-        <p class="stat-number"><%= orderCount %></p>
-      </div>
-      <div class="stat-card">
-        <h3>Pending Orders</h3>
-        <p class="stat-number"><%= pendingOrders %></p>
-      </div>
+          <% if (errorMessage) { %>
+            <div style="padding:10px 12px;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:8px;margin:10px 0 14px;">
+              <%= errorMessage %>
+            </div>
+          <% } %>
+
+          <div class="dashboard-stats">
+            <div class="stat-card">
+              <h3>Tổng sản phẩm</h3>
+              <p class="stat-number"><%= productCount %></p>
+            </div>
+            <div class="stat-card">
+              <h3>Danh mục</h3>
+              <p class="stat-number"><%= categoryCount %></p>
+            </div>
+            <div class="stat-card">
+              <h3>Tổng đơn hàng</h3>
+              <p class="stat-number"><%= orderCount %></p>
+            </div>
+            <div class="stat-card">
+              <h3>Đơn chờ xử lý</h3>
+              <p class="stat-number"><%= pendingOrders %></p>
+            </div>
+            <div class="stat-card">
+              <h3>Tổng doanh thu</h3>
+              <p class="stat-number">
+                <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(totalRevenue || 0)) %>
+              </p>
+            </div>
+            <div class="stat-card">
+              <h3>Giá trị đơn trung bình</h3>
+              <p class="stat-number">
+                <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(averageOrderValue || 0)) %>
+              </p>
+            </div>
+            <div class="stat-card">
+              <h3>Tổng lượt xem sản phẩm</h3>
+              <p class="stat-number"><%= totalViews || 0 %></p>
+            </div>
+          </div>
+
+          <div class="dashboard-actions">
+            <a href="/admin/products" class="btn btn-primary"
+              >Quản lý sản phẩm</a
+            >
+            <a href="/admin/categories" class="btn btn-primary"
+              >Quản lý danh mục</a
+            >
+            <a href="/admin/orders" class="btn btn-primary">Quản lý đơn hàng</a>
+            <a href="/admin/users" class="btn btn-primary">Quản lý người dùng</a>
+            <a href="/admin/banners" class="btn btn-primary">Quản lý banner</a>
+          </div>
+
+          <form method="GET" action="/admin/dashboard" style="margin-top: 1rem; display: flex; gap: 10px; align-items: center;">
+            <label for="period">Chu kỳ biểu đồ theo ngày:</label>
+            <select id="period" name="period">
+              <option value="7" <%= Number(periodDays) === 7 ? 'selected' : '' %>>7 ngày</option>
+              <option value="30" <%= Number(periodDays) === 30 ? 'selected' : '' %>>30 ngày</option>
+            </select>
+            <button type="submit" class="btn btn-secondary">Xem</button>
+          </form>
+
+          <div class="dashboard-stats" style="margin-top: 1rem">
+            <div class="stat-card" style="text-align: left">
+              <h3>Doanh thu và đơn hàng theo ngày (<%= periodDays %> ngày)</h3>
+              <div class="chart-box">
+                <div id="dailyRevenueOrdersFallback" class="chart-fallback" style="display:none;"></div>
+                <canvas id="dailyRevenueOrdersChart"></canvas>
+              </div>
+            </div>
+            <div class="stat-card" style="text-align: left">
+              <h3>Top sản phẩm: Lượt xem và đã bán</h3>
+              <div class="chart-box">
+                <div id="topProductsFallback" class="chart-fallback" style="display:none;"></div>
+                <canvas id="topProductsChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-    
-    <div class="dashboard-actions">
-      <a href="/admin/products" class="btn btn-primary">Manage Products</a>
-      <a href="/admin/categories" class="btn btn-primary">Manage Categories</a>
-      <a href="/admin/orders" class="btn btn-primary">Manage Orders</a>
-        <a href="/admin/users" class="btn btn-primary">Manage User</a>
-    </div>
-  </div>
-</body>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      function formatVietnamNumber(value) {
+        return new Intl.NumberFormat("vi-VN").format(Number(value || 0));
+      }
+
+      function normalizeSeries(values) {
+        return (values || []).map((value) => Number(value || 0));
+      }
+
+      function renderFallbackChart(containerId, labels, datasets) {
+        const container = document.getElementById(containerId);
+        if (!container) {
+          return;
+        }
+
+        const safeLabels = labels || [];
+        const safeDatasets = (datasets || []).map((dataset) => ({
+          label: dataset.label,
+          color: dataset.color,
+          values: normalizeSeries(dataset.values),
+        }));
+
+        if (!safeLabels.length) {
+          container.style.display = "block";
+          container.innerHTML = '<div style="padding:12px;color:#6b7280;">Không có dữ liệu để hiển thị</div>';
+          return;
+        }
+
+        const maxValue = Math.max(
+          1,
+          ...safeDatasets.flatMap((dataset) => dataset.values),
+        );
+
+        container.style.display = "grid";
+        container.style.gap = "10px";
+        container.style.alignContent = "start";
+        container.innerHTML = safeLabels
+          .map((label, index) => {
+            const bars = safeDatasets
+              .map((dataset) => {
+                const value = dataset.values[index] || 0;
+                const height = Math.max(6, (value / maxValue) * 100);
+                return `
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                    <div style="width:100%;height:120px;display:flex;align-items:flex-end;justify-content:center;">
+                      <div title="${dataset.label}: ${formatVietnamNumber(value)}" style="width:70%;height:${height}%;min-height:6px;background:${dataset.color};border-radius:8px 8px 4px 4px;"></div>
+                    </div>
+                    <div style="font-size:12px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;text-align:center;">${dataset.label}: ${formatVietnamNumber(value)}</div>
+                  </div>`;
+              })
+              .join("");
+
+            return `
+              <div style="display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #e5e7eb;">
+                <div style="font-size:12px;color:#6b7280;font-weight:600;">${label}</div>
+                <div style="display:flex;gap:8px;align-items:flex-end;min-height:140px;">${bars}</div>
+              </div>`;
+          })
+          .join("");
+      }
+
+      const dayLabels = <%- JSON.stringify(dayLabels || []) %>;
+      const dailyRevenueSeries = <%- JSON.stringify(dailyRevenueSeries || []) %>;
+      const dailyOrderSeries = <%- JSON.stringify(dailyOrderSeries || []) %>;
+
+      const topProductLabels = <%- JSON.stringify(topProductLabels || []) %>;
+      const topProductViewSeries = <%- JSON.stringify(topProductViewSeries || []) %>;
+      const topProductSoldSeries = <%- JSON.stringify(topProductSoldSeries || []) %>;
+
+      const chartReady = typeof Chart !== "undefined";
+
+      if (chartReady) {
+        Chart.defaults.responsive = true;
+        Chart.defaults.maintainAspectRatio = false;
+      }
+
+      const revenueOrdersCtx = document.getElementById("dailyRevenueOrdersChart");
+      if (chartReady && revenueOrdersCtx) {
+        new Chart(revenueOrdersCtx, {
+          type: "bar",
+          data: {
+            labels: dayLabels,
+            datasets: [
+              {
+                type: "line",
+                label: "Doanh thu (VND)",
+                data: dailyRevenueSeries,
+                borderColor: "#2563eb",
+                backgroundColor: "rgba(37,99,235,0.15)",
+                tension: 0.35,
+                yAxisID: "yRevenue",
+              },
+              {
+                type: "bar",
+                label: "Đơn hàng",
+                data: dailyOrderSeries,
+                backgroundColor: "rgba(16,185,129,0.5)",
+                borderColor: "#10b981",
+                borderWidth: 1,
+                yAxisID: "yOrders",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              yRevenue: {
+                type: "linear",
+                position: "left",
+                beginAtZero: true,
+                ticks: {
+                  callback: (value) => new Intl.NumberFormat("vi-VN").format(value),
+                },
+              },
+              yOrders: {
+                type: "linear",
+                position: "right",
+                beginAtZero: true,
+                grid: { drawOnChartArea: false },
+              },
+            },
+          },
+        });
+      } else {
+        const fallback = document.getElementById("dailyRevenueOrdersFallback");
+        if (fallback) {
+          fallback.style.display = "block";
+          renderFallbackChart("dailyRevenueOrdersFallback", dayLabels, [
+            {
+              label: "Doanh thu",
+              color: "#2563eb",
+              values: dailyRevenueSeries,
+            },
+            {
+              label: "Đơn hàng",
+              color: "#10b981",
+              values: dailyOrderSeries,
+            },
+          ]);
+        }
+      }
+
+      const topProductsCtx = document.getElementById("topProductsChart");
+      if (chartReady && topProductsCtx) {
+        new Chart(topProductsCtx, {
+          type: "bar",
+          data: {
+            labels: topProductLabels,
+            datasets: [
+              {
+                label: "Lượt xem",
+                data: topProductViewSeries,
+                backgroundColor: "rgba(249,115,22,0.5)",
+                borderColor: "#f97316",
+                borderWidth: 1,
+              },
+              {
+                label: "Đã bán",
+                data: topProductSoldSeries,
+                backgroundColor: "rgba(99,102,241,0.5)",
+                borderColor: "#6366f1",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: { beginAtZero: true },
+            },
+          },
+        });
+      } else {
+        const fallback = document.getElementById("topProductsFallback");
+        if (fallback) {
+          fallback.style.display = "block";
+          renderFallbackChart("topProductsFallback", topProductLabels, [
+            {
+              label: "Lượt xem",
+              color: "#f97316",
+              values: topProductViewSeries,
+            },
+            {
+              label: "Đã bán",
+              color: "#6366f1",
+              values: topProductSoldSeries,
+            },
+          ]);
+        }
+      }
+    </script>
+  </body>
 </html>
