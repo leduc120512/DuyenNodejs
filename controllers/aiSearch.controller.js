@@ -63,6 +63,46 @@ function buildMongoFilter(parsed) {
   return filter;
 }
 
+function buildKeywordRegex(message) {
+  const normalized = normalizeText(message || "");
+  const terms = normalized
+    .split(/\s+/)
+    .map((term) => term.trim())
+    .filter((term) => term.length >= 2)
+    .slice(0, 8);
+
+  if (!terms.length) {
+    return null;
+  }
+
+  return new RegExp(terms.join("|"), "i");
+}
+
+async function fallbackSearchProducts(message, parsed) {
+  const mongoFilter = buildMongoFilter(parsed);
+  const keywordRegex = buildKeywordRegex(message);
+
+  if (keywordRegex) {
+    mongoFilter.$or = [
+      { name: { $regex: keywordRegex } },
+      { description: { $regex: keywordRegex } },
+      { searchText: { $regex: keywordRegex } },
+      { tags: { $elemMatch: { $regex: keywordRegex } } },
+    ];
+  }
+
+  const products = await Product.find(mongoFilter)
+    .populate("category", "name")
+    .sort({ sold: -1, homeOrder: 1, createdAt: -1 })
+    .limit(10)
+    .lean();
+
+  return products.map((product) => {
+    const { embedding, searchText, ...safeProduct } = product;
+    return safeProduct;
+  });
+}
+
 exports.aiSearchProducts = async (req, res, next) => {
   try {
     const message = String(req.body.message || "").trim();
@@ -74,41 +114,52 @@ exports.aiSearchProducts = async (req, res, next) => {
       });
     }
 
+    const parsed = parseUserQuery(message);
     const aiHealth = await checkEmbeddingServiceReady();
-    if (!aiHealth.ok) {
-      return res.status(503).json({
-        ok: false,
-        message: `AI chua san sang: ${aiHealth.message}`,
-      });
+
+    let rankedProducts = [];
+    let replyPrefix = "";
+
+    if (aiHealth.ok) {
+      try {
+        const queryEmbedding = await getEmbedding(message);
+        const mongoFilter = buildMongoFilter(parsed);
+
+        const products = await Product.find(mongoFilter)
+          .populate("category", "name")
+          .lean();
+
+        rankedProducts = products
+          .filter(
+            (product) =>
+              Array.isArray(product.embedding) && product.embedding.length > 0,
+          )
+          .map((product) => {
+            const score = cosineSimilarity(queryEmbedding, product.embedding);
+
+            return {
+              ...product,
+              score,
+            };
+          })
+          .sort((a, b) => {
+            if (b.score !== a.score) return b.score - a.score;
+            if (b.sold !== a.sold) return b.sold - a.sold;
+            return a.price - b.price;
+          })
+          .slice(0, 10);
+      } catch (embeddingError) {
+        console.error("AI SEARCH EMBEDDING ERROR:", embeddingError.message);
+      }
     }
 
-    const parsed = parseUserQuery(message);
-    const queryEmbedding = await getEmbedding(message);
-    const mongoFilter = buildMongoFilter(parsed);
-
-    const products = await Product.find(mongoFilter)
-      .populate("category", "name")
-      .lean();
-
-    const rankedProducts = products
-      .filter(
-        (product) =>
-          Array.isArray(product.embedding) && product.embedding.length > 0,
-      )
-      .map((product) => {
-        const score = cosineSimilarity(queryEmbedding, product.embedding);
-
-        return {
-          ...product,
-          score,
-        };
-      })
-      .sort((a, b) => {
-        if (b.score !== a.score) return b.score - a.score;
-        if (b.sold !== a.sold) return b.sold - a.sold;
-        return a.price - b.price;
-      })
-      .slice(0, 10);
+    if (!rankedProducts.length) {
+      rankedProducts = await fallbackSearchProducts(message, parsed);
+      if (!aiHealth.ok) {
+        replyPrefix =
+          "(AI tam thoi chua san sang, da chuyen sang tim kiem thuong) ";
+      }
+    }
 
     if (req.session?.userId) {
       await UserHistory.create({
@@ -124,7 +175,7 @@ exports.aiSearchProducts = async (req, res, next) => {
     let reply = "Không tìm thấy sản phẩm phù hợp.";
 
     if (rankedProducts.length > 0) {
-      reply = `Tôi tìm thấy ${rankedProducts.length} sản phẩm phù hợp nhất cho bạn.`;
+      reply = `${replyPrefix}Tôi tìm thấy ${rankedProducts.length} sản phẩm phù hợp nhất cho bạn.`;
     }
 
     return res.json({
