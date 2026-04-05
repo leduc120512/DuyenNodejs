@@ -219,6 +219,20 @@ body {
   margin: 0.25rem 0;
 }
 
+/* Sold out product card styles */
+.product-card.sold-out {
+  opacity: 0.7;
+  pointer-events: none;
+  text-decoration: none;
+  color: inherit;
+  cursor: not-allowed;
+}
+
+.product-card.sold-out:hover {
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* Category List */
 .category-list {
   display: flex;

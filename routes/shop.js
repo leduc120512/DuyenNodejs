@@ -21,19 +21,11 @@ router.get("/", async (req, res) => {
     const userId = req.session?.userId?.toString() || req.query.userId || null;
     console.log("User ID:", userId || "(anonymous)");
 
-    const [topProducts, latestProducts, categories, banners] =
+    const [topProductsAll, latestProductsAll, categories, banners] =
       await Promise.all([
-        Product.find()
-          .populate("category", "name")
-          .sort({ sold: -1 })
-          .limit(8)
-          .lean(),
+        Product.find().populate("category", "name").lean(),
 
-        Product.find()
-          .populate("category", "name")
-          .sort({ homeOrder: 1, createdAt: -1 })
-          .limit(12)
-          .lean(),
+        Product.find().populate("category", "name").lean(),
 
         Category.find().select("name image").lean(),
 
@@ -41,6 +33,36 @@ router.get("/", async (req, res) => {
           .sort({ sortOrder: 1, createdAt: -1 })
           .lean(),
       ]);
+
+    // Sort top products: in stock by sold desc, then sold out at the end
+    const topProducts = topProductsAll
+      .sort((a, b) => {
+        const aInStock = a.stock > 0 ? 1 : 0;
+        const bInStock = b.stock > 0 ? 1 : 0;
+
+        if (aInStock !== bInStock) {
+          return bInStock - aInStock; // In stock products first
+        }
+
+        // For products with same stock status, sort by sold count
+        return (b.sold || 0) - (a.sold || 0);
+      })
+      .slice(0, 8);
+
+    // Sort latest products: in stock by homeOrder, then sold out at the end
+    const latestProducts = latestProductsAll
+      .sort((a, b) => {
+        const aInStock = a.stock > 0 ? 1 : 0;
+        const bInStock = b.stock > 0 ? 1 : 0;
+
+        if (aInStock !== bInStock) {
+          return bInStock - aInStock; // In stock products first
+        }
+
+        // For products with same stock status, sort by homeOrder
+        return (a.homeOrder || 9999) - (b.homeOrder || 9999);
+      })
+      .slice(0, 12);
 
     const fallbackBanners = topProducts.slice(0, 5).map((product) => ({
       image:
@@ -120,10 +142,20 @@ router.get("/products", async (req, res) => {
     if (search) query.name = { $regex: search, $options: "i" };
     if (categoryId) query.category = categoryId;
 
-    const products = await Product.find(query)
-      .populate("category")
-      .sort({ createdAt: -1 })
-      .lean();
+    const products = await Product.find(query).populate("category").lean();
+
+    // Sort: in stock first (by homeOrder), then sold out products at the end
+    products.sort((a, b) => {
+      const aInStock = a.stock > 0 ? 1 : 0;
+      const bInStock = b.stock > 0 ? 1 : 0;
+
+      if (aInStock !== bInStock) {
+        return bInStock - aInStock; // In stock products first
+      }
+
+      // For products with same stock status, sort by homeOrder (smaller = higher priority)
+      return (a.homeOrder || 9999) - (b.homeOrder || 9999);
+    });
 
     const categories = await Category.find().sort({ name: 1 }).lean();
 

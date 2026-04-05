@@ -134,15 +134,31 @@ router.get("/dashboard", isAdmin, async (req, res) => {
         { $match: { status: { $ne: "cancelled" } } },
         { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
       ]),
-      Order.aggregate([
-        {
-          $match: {
-            createdAt: { $gte: fromDate },
-            status: { $ne: "cancelled" },
-          },
-        },
-        {
           $group: {
+          const productsUnsorted = await Product.find(query)
+            .populate("category");
+
+          // Sort: in stock first, sold out at the end
+          const products = productsUnsorted.sort((a, b) => {
+            const aInStock = a.stock > 0 ? 1 : 0;
+            const bInStock = b.stock > 0 ? 1 : 0;
+      
+            if (aInStock !== bInStock) {
+              return bInStock - aInStock; // In stock products first
+            }
+      
+            // For products with same stock status, sort by selected field
+            if (sortBy === "viewCount" || sortBy === "sold") {
+              return sortOrder === 1 
+                ? (a[sortBy] || 0) - (b[sortBy] || 0)
+                : (b[sortBy] || 0) - (a[sortBy] || 0);
+            }
+      
+            // For homeOrder
+            return sortOrder === 1
+              ? (a.homeOrder || 9999) - (b.homeOrder || 9999)
+              : (b.homeOrder || 9999) - (a.homeOrder || 9999);
+          });
             _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
             revenue: { $sum: "$totalAmount" },
             orders: { $sum: 1 },
@@ -434,6 +450,18 @@ router.post(
         tags,
         searchText,
       } = req.body;
+      
+        // Validate required fields
+        if (!name || !description || !price || !category) {
+          const categories = await Category.find().sort({ name: 1 });
+          return res.render("admin/product-form", {
+            user: req.session,
+            product: null,
+            categories,
+            error: "Vui lòng điền đầy đủ các trường bắt buộc (Tên, Mô tả, Giá, Danh mục)",
+          });
+        }
+
       const uploadedImages = Array.isArray(req.files)
         ? req.files.map((file) => `/uploads/${file.filename}`)
         : [];
@@ -462,12 +490,13 @@ router.post(
       await syncProductSearchData(product._id);
       res.redirect("/admin/products");
     } catch (error) {
+        console.error("Add product error:", error);
       const categories = await Category.find().sort({ name: 1 });
       res.render("admin/product-form", {
         user: req.session,
         product: null,
         categories,
-        error: "Error adding product",
+          error: "Lỗi khi thêm sản phẩm: " + error.message,
       });
     }
   },
@@ -586,7 +615,18 @@ router.post(
 
       res.redirect("/admin/products");
     } catch (error) {
-      res.status(500).send("Server error");
+      console.error("Edit product error:", error);
+      const product = await Product.findById(req.params.id).populate(
+        "category",
+        "name",
+      );
+      const categories = await Category.find().sort({ name: 1 });
+      res.render("admin/product-form", {
+        user: req.session,
+        product,
+        categories,
+        error: "Lỗi khi cập nhật sản phẩm: " + error.message,
+      });
     }
   },
 );

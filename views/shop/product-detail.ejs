@@ -187,7 +187,7 @@
       <div class="product-detail">
         <div class="product-image">
           <% const productImages = product.images && product.images.length ? product.images : [product.image]; %>
-          <img id="mainProductImage" src="<%= productImages[0] %>" alt="<%= product.name %>" />
+          <img id="mainProductImage" src="<%= productImages[0] || '/images/default-product.jpg' %>" alt="<%= product.name %>" onerror="this.onerror=null;this.src='/images/default-product.jpg';" />
 
           <% if (productImages.length > 1) { %>
             <div class="thumb-list">
@@ -196,6 +196,7 @@
                   src="<%= img %>"
                   alt="<%= product.name %> image <%= index + 1 %>"
                   class="thumb-item <%= index === 0 ? 'active' : '' %>"
+                  onerror="this.onerror=null;this.src='/images/default-product.jpg';"
                   onclick="changeMainImage(this, '<%= img %>')"
                 />
               <% }) %>

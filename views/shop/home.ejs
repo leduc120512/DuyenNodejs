@@ -286,12 +286,25 @@
         <h2 class="section-title">Gợi ý dành riêng cho bạn</h2>
         <div class="product-grid">
           <% recommendedProducts.forEach(product => { %>
-          <a href="/products/<%= product._id %>" class="product-card">
-            <img
-              src="<%= (product.images && product.images.length ? product.images[0] : (product.image || '/images/default-product.jpg')) %>"
-              alt="<%= product.name %>"
-              loading="lazy"
-            />
+          <%
+            const isOutOfStock = product.stock <= 0;
+            const cardUrl = isOutOfStock ? '#' : '/products/' + product._id;
+            const cardClass = isOutOfStock ? 'product-card sold-out' : 'product-card';
+          %>
+          <a href="<%= cardUrl %>" class="<%= cardClass %>">
+            <div style="position:relative;display:inline-block;width:100%;overflow:hidden;border-radius:8px;">
+              <img
+                src="<%= (product.images && product.images.length ? product.images[0] : (product.image || '/images/default-product.jpg')) %>"
+                alt="<%= product.name %>"
+                loading="lazy"
+                onerror="this.onerror=null;this.src='/images/default-product.jpg';"
+              />
+              <% if (product.stock <= 0) { %>
+                <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;">
+                  <span style="color:white;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:1px;">Hết Hàng</span>
+                </div>
+              <% } %>
+            </div>
             <div class="info">
               <h3><%= product.name %></h3>
               <p class="category"><%= product.category?.name || 'Khác' %></p>
@@ -299,8 +312,7 @@
                 <%= product.price.toLocaleString('vi-VN') %> ₫
               </p>
               <p class="meta">
-                Đánh giá: <%= product.rating || 'N/A' %> ★ | Còn: <%=
-                product.stock %> sp
+                Đánh giá: <%= product.rating || 'N/A' %> ★ | Còn: <%= product.stock > 0 ? product.stock : 0 %> sp
               </p>
             </div>
           </a>
@@ -314,12 +326,25 @@
         <h2 class="section-title">Top sản phẩm bán chạy</h2>
         <div class="product-grid">
           <% topProducts.forEach(product => { %>
-          <a href="/products/<%= product._id %>" class="product-card">
-            <img
-              src="<%= (product.images && product.images.length ? product.images[0] : (product.image || '/images/default-product.jpg')) %>"
-              alt="<%= product.name %>"
-              loading="lazy"
-            />
+          <%
+            const isOutOfStock = product.stock <= 0;
+            const cardUrl = isOutOfStock ? '#' : '/products/' + product._id;
+            const cardClass = isOutOfStock ? 'product-card sold-out' : 'product-card';
+          %>
+          <a href="<%= cardUrl %>" class="<%= cardClass %>">
+            <div style="position:relative;display:inline-block;width:100%;overflow:hidden;border-radius:8px;">
+              <img
+                src="<%= (product.images && product.images.length ? product.images[0] : (product.image || '/images/default-product.jpg')) %>"
+                alt="<%= product.name %>"
+                loading="lazy"
+                onerror="this.onerror=null;this.src='/images/default-product.jpg';"
+              />
+              <% if (product.stock <= 0) { %>
+                <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;">
+                  <span style="color:white;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:1px;">Hết Hàng</span>
+                </div>
+              <% } %>
+            </div>
             <div class="info">
               <h3><%= product.name %></h3>
               <p class="category">
@@ -329,7 +354,7 @@
                 <%= product.price.toLocaleString('vi-VN') %> ₫
               </p>
               <p class="meta">
-                Đã bán: <%= product.sold || 0 %> | Còn: <%= product.stock %>
+                Đã bán: <%= product.sold || 0 %> | Còn: <%= product.stock > 0 ? product.stock : 0 %>
               </p>
             </div>
           </a>
@@ -346,7 +371,7 @@
             href="/products?category=<%= category._id %>"
             class="category-item"
           >
-            <img src="<%= category.image || '/images/default-product.jpg' %>" alt="<%= category.name %>">
+            <img src="<%= category.image || '/images/default-product.jpg' %>" alt="<%= category.name %>" onerror="this.onerror=null;this.src='/images/default-product.jpg';">
             <span><%= category.name %></span>
           </a>
           <% }) %>
@@ -358,12 +383,25 @@
         <h2 class="section-title">Tất cả sản phẩm</h2>
         <div class="product-grid">
           <% products.forEach(product => { %>
-          <a href="/products/<%= product._id %>" class="product-card">
-            <img
-              src="<%= (product.images && product.images.length ? product.images[0] : (product.image || '/images/default-product.jpg')) %>"
-              alt="<%= product.name %>"
-              loading="lazy"
-            />
+          <%
+            const isOutOfStock = product.stock <= 0;
+            const cardUrl = isOutOfStock ? '#' : '/products/' + product._id;
+            const cardClass = isOutOfStock ? 'product-card sold-out' : 'product-card';
+          %>
+          <a href="<%= cardUrl %>" class="<%= cardClass %>">
+            <div style="position:relative;display:inline-block;width:100%;overflow:hidden;border-radius:8px;">
+              <img
+                src="<%= (product.images && product.images.length ? product.images[0] : (product.image || '/images/default-product.jpg')) %>"
+                alt="<%= product.name %>"
+                loading="lazy"
+                onerror="this.onerror=null;this.src='/images/default-product.jpg';"
+              />
+              <% if (product.stock <= 0) { %>
+                <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;">
+                  <span style="color:white;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:1px;">Hết Hàng</span>
+                </div>
+              <% } %>
+            </div>
             <div class="info">
               <h3><%= product.name %></h3>
               <p class="category">
@@ -373,7 +411,7 @@
                 <%= product.price.toLocaleString('vi-VN') %> ₫
               </p>
               <p class="meta">
-                Tồn kho: <%= product.stock %> | Đánh giá: <%= product.rating ||
+                Tồn kho: <%= product.stock > 0 ? product.stock : 0 %> | Đánh giá: <%= product.rating ||
                 'N/A' %>
               </p>
             </div>

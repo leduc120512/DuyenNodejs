@@ -15,13 +15,13 @@
         <h2 style="margin-bottom: 12px;">Search by Category</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;">
           <a href="/products" style="text-decoration:none;color:#222;border:1px solid #ddd;border-radius:10px;overflow:hidden;background:#fff;">
-            <img src="/images/default-product.jpg" alt="All categories" style="width:100%;height:110px;object-fit:cover;display:block;">
+            <img src="/images/default-product.jpg" alt="All categories" style="width:100%;height:110px;object-fit:cover;display:block;" onerror="this.onerror=null;this.src='/images/default-product.jpg';">
             <div style="padding:8px 10px;font-weight:600;text-align:center;">All</div>
           </a>
 
           <% categories.forEach(category => { %>
             <a href="/products?category=<%= category._id %>" style="text-decoration:none;color:#222;border:1px solid #ddd;border-radius:10px;overflow:hidden;background:#fff;">
-              <img src="<%= category.image || '/images/default-product.jpg' %>" alt="<%= category.name %>" style="width:100%;height:110px;object-fit:cover;display:block;">
+              <img src="<%= category.image || '/images/default-product.jpg' %>" alt="<%= category.name %>" style="width:100%;height:110px;object-fit:cover;display:block;" onerror="this.onerror=null;this.src='/images/default-product.jpg';">
               <div style="padding:8px 10px;font-weight:600;text-align:center;"><%= category.name %></div>
             </a>
           <% }) %>
@@ -31,13 +31,25 @@
 
     <div class="product-grid">
       <% products.forEach(product => { %>
-        <a href="/products/<%= product._id %>" class="product-card" style="display:block;text-decoration:none;color:inherit;">
-          <img src="<%= (product.images && product.images.length ? product.images[0] : product.image) %>" alt="<%= product.name %>">
+        <% 
+          const isOutOfStock = product.stock <= 0;
+          const cardUrl = isOutOfStock ? '#' : '/products/' + product._id;
+          const cardClass = isOutOfStock ? 'product-card sold-out' : 'product-card';
+        %>
+        <a href="<%= cardUrl %>" class="<%= cardClass %>">
+          <div style="position:relative;display:inline-block;width:100%;">
+            <img src="<%= (product.images && product.images.length ? product.images[0] : product.image) || '/images/default-product.jpg' %>" alt="<%= product.name %>" onerror="this.onerror=null;this.src='/images/default-product.jpg';">
+            <% if (isOutOfStock) { %>
+              <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;border-radius:8px;">
+                <span style="color:white;font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:1px;">Hết Hàng</span>
+              </div>
+            <% } %>
+          </div>
           <h3><%= product.name %></h3>
           <p class="category"><%= product.category ? product.category.name : 'No Category' %></p>
 
           <p class="price">$<%= product.price.toFixed(2) %></p>
-          <p class="stock">In stock: <%= product.stock %></p>
+          <p class="stock"><%= isOutOfStock ? 'Hết hàng' : 'Còn hàng: ' + product.stock %></p>
         </a>
       <% }) %>
     </div>

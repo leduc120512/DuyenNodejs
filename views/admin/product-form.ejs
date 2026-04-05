@@ -135,7 +135,17 @@
           </div>
         <% } %>
         <input type="file" id="images" name="images" accept="image/*" multiple>
-        <small>Uncheck an existing image to remove it on update.</small>
+          <small>Uncheck an existing image to remove it on update.</small>
+          <div id="newImagePreview" style="margin-top:15px;display:flex;flex-wrap:wrap;gap:10px;"></div>
+        
+          <% if (product && product.images && product.images.length) { %>
+            <div style="margin-top:20px;padding:10px;background:#f0f0f0;border-radius:8px;">
+              <p style="margin:0 0 10px 0;font-size:14px;color:#666;">
+                <strong>Current images: <%= product.images.length %></strong> - Total: <%= product.images.length + (product.images.length > 1 ? ' images' : ' image') %>
+              </p>
+              <button type="button" id="clearAllImages" class="btn btn-sm" style="background:#dc3545;padding:5px 10px;font-size:12px;">Clear All Existing Images</button>
+            </div>
+          <% } %>
       </div>
       
       <div class="form-actions">
@@ -146,6 +156,78 @@
       </div>
     </main>
   </div>
+  
+    <script>
+      // Preview new images before upload
+      document.getElementById('images').addEventListener('change', function(e) {
+        const preview = document.getElementById('newImagePreview');
+        preview.innerHTML = '';
+      
+        if (this.files && this.files.length > 0) {
+          Array.from(this.files).forEach((file, index) => {
+              // Check file size (5MB limit)
+              if (file.size > 5 * 1024 * 1024) {
+                alert('File ' + file.name + ' is too large! Max 5MB per file.');
+                return;
+              }
+          
+            const reader = new FileReader();
+            reader.onload = function(event) {
+              const div = document.createElement('div');
+              div.style.cssText = 'position:relative;width:80px;height:80px;border:2px solid #007bff;border-radius:8px;overflow:hidden;';
+              const img = document.createElement('img');
+              img.src = event.target.result;
+              img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+              const label = document.createElement('span');
+              label.textContent = 'New';
+              label.style.cssText = 'position:absolute;top:2px;right:2px;background:#007bff;color:white;font-size:10px;padding:2px 4px;border-radius:3px;';
+              div.appendChild(img);
+              div.appendChild(label);
+              preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+      });
+    
+        // Clear all existing images
+        const clearButton = document.getElementById('clearAllImages');
+        if (clearButton) {
+          clearButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            const checkboxes = document.querySelectorAll('input[name="existingImages"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            alert('All existing images will be removed on save. You can still undo by not saving.');
+          });
+        }
+    
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+          const name = document.getElementById('name').value.trim();
+          const description = document.getElementById('description').value.trim();
+          const price = document.getElementById('price').value;
+          const category = document.getElementById('category').value;
+          const stock = document.getElementById('stock').value;
+      
+          if (!name || !description || !price || !category || stock === '') {
+            e.preventDefault();
+            alert('Vui lòng điền đầy đủ: Tên, Mô tả, Giá, Danh mục, Tồn kho');
+            return false;
+          }
+      
+          if (parseFloat(price) <= 0) {
+            e.preventDefault();
+            alert('Giá phải > 0');
+            return false;
+          }
+      
+          if (parseInt(stock) < 0) {
+            e.preventDefault();
+            alert('Tồn kho không được âm');
+            return false;
+          }
+        });
+    </script>
 </body>
 </html>
 
