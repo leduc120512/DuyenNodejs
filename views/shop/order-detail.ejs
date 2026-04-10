@@ -1,50 +1,50 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Details - Shop thương mại điện tử</title>
+  <title>Chi tiết đơn hàng - Shop thương mại điện tử</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <%- include('../partials/navbar') %>
   
   <div class="container">
-    <h1>Order #<%= order._id.toString().slice(-6) %></h1>
+    <h1>Đơn #<%= order._id.toString().slice(-6) %></h1>
     
     <div class="order-detail">
       <div class="order-info">
-        <h3>Order Information</h3>
-        <p><strong>Status:</strong> <span class="status status-<%= order.status %>"><%= order.status %></span></p>
-        <p><strong>Order Date:</strong> <%= new Date(order.createdAt).toLocaleDateString() %></p>
-        <p><strong>Total Amount:</strong> $<%= order.totalAmount.toFixed(2) %></p>
+        <h3>Thông tin đơn hàng</h3>
+        <p><strong>Trạng thái:</strong> <span class="status status-<%= order.status %>"><%= order.status %></span></p>
+        <p><strong>Ngày đặt:</strong> <%= new Date(order.createdAt).toLocaleDateString('vi-VN') %></p>
+        <p><strong>Tổng cộng:</strong> <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(order.totalAmount || 0)) %></p>
       </div>
       
       <div class="order-info">
-        <h3>Shipping Information</h3>
-        <p><strong>Name:</strong> <%= order.shippingAddress.fullName %></p>
-        <p><strong>Phone:</strong> <%= order.shippingAddress.phone %></p>
-        <p><strong>Address:</strong> <%= order.shippingAddress.address %></p>
+        <h3>Thông tin giao hàng</h3>
+        <p><strong>Họ tên:</strong> <%= order.shippingAddress.fullName %></p>
+        <p><strong>Số điện thoại:</strong> <%= order.shippingAddress.phone %></p>
+        <p><strong>Địa chỉ:</strong> <%= order.shippingAddress.address %></p>
       </div>
     </div>
     
-    <h3>Order Items</h3>
+    <h3>Sản phẩm trong đơn</h3>
     <table class="data-table">
       <thead>
         <tr>
-          <th>Product</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Subtotal</th>
+          <th>Sản phẩm</th>
+          <th>Giá</th>
+          <th>Số lượng</th>
+          <th>Tạm tính</th>
         </tr>
       </thead>
       <tbody>
         <% order.items.forEach(item => { %>
           <tr>
             <td><%= item.product.name %></td>
-            <td>$<%= item.price.toFixed(2) %></td>
+            <td><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.price || 0)) %></td>
             <td><%= item.quantity %></td>
-            <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+            <td><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.price * item.quantity || 0)) %></td>
           </tr>
         <% }) %>
       </tbody>
@@ -54,7 +54,7 @@
  
       <% if (order.status === 'pending') { %>
         <form action="/orders/<%= order._id %>/cancel" method="POST" style="display: inline;">
-          <button type="submit" class="btn btn-danger" onclick="return confirm('Cancel this order?')">Cancel Order</button>
+          <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc muốn hủy đơn hàng này?')">Hủy đơn hàng</button>
         </form>
       <% } %>
     </div>

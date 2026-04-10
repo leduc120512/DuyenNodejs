@@ -7,30 +7,30 @@
     <div class="search-wrapper">
       <!-- Äá»•i tá»« <form> sang <div> Ä‘á»ƒ dá»… control overflow -->
       <input id="search-input" placeholder="Tìm kiếm sản phẩm..." />
-      <button>Search</button>
+      <button>Tìm kiếm</button>
       <div id="ai-suggest-box"></div>
     </div>
 
     <!-- NAVIGATION -->
     <ul class="nav-menu">
       <% if (user && user.userId) { %> <% if (user.userRole === 'admin') { %>
-      <li><a href="/admin/dashboard">Dashboard</a></li>
-      <li><a href="/admin/products">Products</a></li>
-      <li><a href="/admin/categories">Categories</a></li>
-      <li><a href="/admin/orders">Orders</a></li>
+      <li><a href="/admin/dashboard">Bảng điều khiển</a></li>
+      <li><a href="/admin/products">Sản phẩm</a></li>
+      <li><a href="/admin/categories">Danh mục</a></li>
+      <li><a href="/admin/orders">Đơn hàng</a></li>
       <% } else { %>
-      <li><a href="/cart">Cart</a></li>
-      <li><a href="/orders">My Orders</a></li>
-      <li><a href="/profile">Profile</a></li>
+      <li><a href="/cart">Giỏ hàng</a></li>
+      <li><a href="/orders">Đơn hàng của tôi</a></li>
+      <li><a href="/profile">Hồ sơ</a></li>
       <% } %>
 
       <li class="username"><%= user.userName %></li>
-      <li><a href="/auth/logout">Logout</a></li>
+      <li><a href="/auth/logout">Đăng xuất</a></li>
 
       <% } else { %>
-      <li><a href="/">Home</a></li>
-      <li><a href="/auth/login">Login</a></li>
-      <li><a href="/auth/register">Register</a></li>
+      <li><a href="/">Trang chủ</a></li>
+      <li><a href="/auth/login">Đăng nhập</a></li>
+      <li><a href="/auth/register">Đăng ký</a></li>
       <% } %>
     </ul>
   </div>

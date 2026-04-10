@@ -1,51 +1,51 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout - Shop thương mại điện tử</title>
+  <title>Thanh toán - Shop thương mại điện tử</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <%- include('../partials/navbar') %>
   
   <div class="container">
-    <h1>Checkout</h1>
+    <h1>Thanh toán</h1>
     
     <div class="checkout-container">
       <div class="checkout-form">
-        <h2>Shipping Information</h2>
+        <h2>Thông tin giao hàng</h2>
         <form action="/checkout" method="POST">
           <div class="form-group">
-            <label for="fullName">Full Name</label>
+            <label for="fullName">Họ và tên</label>
             <input type="text" id="fullName" name="fullName" value="<%= userInfo.fullName %>" required>
           </div>
           
           <div class="form-group">
-            <label for="phone">Phone</label>
+            <label for="phone">Số điện thoại</label>
             <input type="text" id="phone" name="phone" value="<%= userInfo.phone %>" required>
           </div>
           
           <div class="form-group">
-            <label for="address">Shipping Address</label>
+            <label for="address">Địa chỉ giao hàng</label>
             <textarea id="address" name="address" rows="3" required><%= userInfo.address %></textarea>
           </div>
           
-          <button type="submit" class="btn btn-primary btn-lg">Place Order</button>
+          <button type="submit" class="btn btn-primary btn-lg">Đặt hàng</button>
         </form>
       </div>
       
       <div class="order-summary">
-        <h2>Order Summary</h2>
+        <h2>Tóm tắt đơn hàng</h2>
         <% cart.forEach(item => { %>
           <div class="summary-item">
             <span><%= item.name %> x <%= item.quantity %></span>
-            <span>$<%= (item.price * item.quantity).toFixed(2) %></span>
+            <span><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.price * item.quantity || 0)) %></span>
           </div>
         <% }) %>
         <div class="summary-total">
-          <strong>Total:</strong>
-          <strong>$<%= total.toFixed(2) %></strong>
+          <strong>Tổng cộng:</strong>
+          <strong><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(total || 0)) %></strong>
         </div>
       </div>
     </div>

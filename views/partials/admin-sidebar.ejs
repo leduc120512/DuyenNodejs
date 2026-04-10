@@ -3,47 +3,47 @@
   <div class="admin-brand">
     <div class="admin-brand-mark">FS</div>
     <div>
-      <div class="admin-brand-title">Admin thương mại điện tử</div>
-      <div class="admin-brand-subtitle">Control center</div>
+      <div class="admin-brand-title">Quản trị thương mại điện tử</div>
+      <div class="admin-brand-subtitle">Trung tâm điều khiển</div>
     </div>
   </div>
 
   <nav class="admin-nav">
     <div class="admin-nav-group">
-      <div class="admin-nav-label">Overview</div>
+      <div class="admin-nav-label">Tổng quan</div>
       <a
         href="/admin/dashboard"
         class="admin-nav-link <%= activePath === '/admin/dashboard' ? 'active' : '' %>"
       >
-        Dashboard
+        Bảng điều khiển
       </a>
     </div>
 
     <div class="admin-nav-group">
-      <div class="admin-nav-label">Management</div>
+      <div class="admin-nav-label">Quản lý</div>
       <a
         href="/admin/products"
         class="admin-nav-link <%= activePath.startsWith('/admin/products') ? 'active' : '' %>"
       >
-        Products
+        Sản phẩm
       </a>
       <a
         href="/admin/categories"
         class="admin-nav-link <%= activePath.startsWith('/admin/categories') ? 'active' : '' %>"
       >
-        Categories
+        Danh mục
       </a>
       <a
         href="/admin/orders"
         class="admin-nav-link <%= activePath.startsWith('/admin/orders') ? 'active' : '' %>"
       >
-        Orders
+        Đơn hàng
       </a>
       <a
         href="/admin/users"
         class="admin-nav-link <%= activePath.startsWith('/admin/users') ? 'active' : '' %>"
       >
-        Users
+        Người dùng
       </a>
       <a
         href="/admin/banners"
@@ -54,9 +54,9 @@
     </div>
 
     <div class="admin-nav-group">
-      <div class="admin-nav-label">Actions</div>
-      <a href="/" class="admin-nav-link">View store</a>
-      <a href="/auth/logout" class="admin-nav-link danger">Logout</a>
+      <div class="admin-nav-label">Thao tác</div>
+      <a href="/" class="admin-nav-link">Xem cửa hàng</a>
+      <a href="/auth/logout" class="admin-nav-link danger">Đăng xuất</a>
     </div>
   </nav>
 
@@ -77,4 +77,3 @@
     </div>
   </div>
 </aside>
-

@@ -1,32 +1,32 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Shop thương mại điện tử</title>
+  <title>Đăng nhập - Shop thương mại điện tử</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="auth-page">
   <div class="auth-container">
     <div class="auth-box">
       <div class="auth-brand">Shop thuong mai dien tu</div>
-      <h1>Login</h1>
-      <p class="auth-subtitle">Welcome back. Dang nhap de tiep tuc mua sam.</p>
+      <h1>Đăng nhập</h1>
+      <p class="auth-subtitle">Chào mừng bạn quay lại. Đăng nhập để tiếp tục mua sắm.</p>
       <% if (error) { %>
         <div class="alert alert-error"><%= error %></div>
       <% } %>
       <form action="/auth/login" method="POST">
         <div class="form-group">
-          <label for="username">Username</label>
+          <label for="username">Tên đăng nhập</label>
           <input type="text" id="username" name="username" required>
         </div>
         <div class="form-group">
-          <label for="password">Password</label>
+          <label for="password">Mật khẩu</label>
           <input type="password" id="password" name="password" required>
         </div>
-        <button type="submit" class="btn btn-primary">Login</button>
+        <button type="submit" class="btn btn-primary">Đăng nhập</button>
       </form>
-      <p class="auth-link">Don't have an account? <a href="/auth/register">Register here</a></p>
+      <p class="auth-link">Chưa có tài khoản? <a href="/auth/register">Đăng ký tại đây</a></p>
   
     </div>
   </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -67,8 +67,8 @@
         <a href="/products/<%= product._id %>" class="product-card" style="display:block;text-decoration:none;color:inherit;">
           <img src="<%= product.image %>" alt="<%= product.name %>">
           <h3><%= product.name %></h3>
-          <p><%= product.category ? product.category.name : "No Category" %></p>
-          <p><%= Number(product.price).toLocaleString("vi-VN") %> đ</p>
+          <p><%= product.category ? product.category.name : "Chưa có danh mục" %></p>
+          <p><%= Number(product.price).toLocaleString("vi-VN") %> ₫</p>
         </a>
       <% }) %>
     </div>

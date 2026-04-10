@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,11 +14,11 @@
           <img src="<%= product.image %>" alt="<%= product.name %>" />
           <h3><%= product.name %></h3>
           <p class="category">
-            <%= product.category ? product.category.name : 'No Category' %>
+            <%= product.category ? product.category.name : 'Chưa có danh mục' %>
           </p>
 
-          <p class="price">$<%= product.price.toFixed(2) %></p>
-          <p class="stock">In stock: <%= product.stock %></p>
+          <p class="price"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price || 0)) %></p>
+          <p class="stock">Còn hàng: <%= product.stock %></p>
         </a>
         <% }) %>
       </div>

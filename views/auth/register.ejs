@@ -1,17 +1,17 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register - Shop thương mại điện tử</title>
+  <title>Đăng ký - Shop thương mại điện tử</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="auth-page">
   <div class="auth-container">
     <div class="auth-box auth-box--register">
       <div class="auth-brand">Shop thuong mai dien tu</div>
-      <h1>Register</h1>
-      <p class="auth-subtitle">Tao tai khoan moi de mua sam nhanh hon.</p>
+      <h1>Đăng ký</h1>
+      <p class="auth-subtitle">Tạo tài khoản mới để mua sắm nhanh hơn.</p>
 
       <!-- lá»—i chung -->
       <% if (error) { %>
@@ -22,7 +22,7 @@
 
         <!-- USERNAME -->
         <div class="form-group">
-          <label for="username">Username</label>
+          <label for="username">Tên đăng nhập</label>
           <input 
             type="text" 
             id="username" 
@@ -52,7 +52,7 @@
 
         <!-- FULL NAME -->
         <div class="form-group">
-          <label for="fullName">Full Name</label>
+          <label for="fullName">Họ và tên</label>
           <input 
             type="text" 
             id="fullName" 
@@ -67,7 +67,7 @@
 
         <!-- PHONE -->
         <div class="form-group">
-          <label for="phone">Phone</label>
+          <label for="phone">Số điện thoại</label>
           <input 
             type="text" 
             id="phone" 
@@ -78,7 +78,7 @@
 
         <!-- ADDRESS -->
         <div class="form-group">
-          <label for="address">Address</label>
+          <label for="address">Địa chỉ</label>
           <textarea 
             id="address" 
             name="address" 
@@ -88,7 +88,7 @@
 
         <!-- PASSWORD -->
         <div class="form-group">
-          <label for="password">Password</label>
+          <label for="password">Mật khẩu</label>
           <input 
             type="password" 
             id="password" 
@@ -103,7 +103,7 @@
 
         <!-- CONFIRM PASSWORD -->
         <div class="form-group">
-          <label for="confirmPassword">Confirm Password</label>
+          <label for="confirmPassword">Xác nhận mật khẩu</label>
           <input 
             type="password" 
             id="confirmPassword" 
@@ -116,12 +116,12 @@
           <% } %>
         </div>
 
-        <button type="submit" class="btn btn-primary">Register</button>
+        <button type="submit" class="btn btn-primary">Đăng ký</button>
       </form>
 
       <p class="auth-link">
-        Already have an account? 
-        <a href="/auth/login">Login here</a>
+        Đã có tài khoản? 
+        <a href="/auth/login">Đăng nhập tại đây</a>
       </p>
     </div>
   </div>

@@ -1,9 +1,9 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Orders - Shop thương mại điện tử</title>
+  <title>Đơn hàng của tôi - Shop thương mại điện tử</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -13,28 +13,28 @@
 
     
     <form action="/orders" method="GET" class="search-form">
-      <input type="text" name="search" placeholder="Search by product name..." value="<%= search %>">
-      <button type="submit" class="btn btn-secondary">Search</button>
+      <input type="text" name="search" placeholder="Tìm theo tên sản phẩm..." value="<%= search %>">
+      <button type="submit" class="btn btn-secondary">Tìm kiếm</button>
     </form>
     
     <% if (orders.length === 0) { %>
-      <p class="empty-orders">You haven't placed any orders yet. <a href="/products">Start shopping</a></p>
+      <p class="empty-orders">Bạn chưa đặt đơn hàng nào. <a href="/products">Bắt đầu mua sắm</a></p>
     <% } else { %>
       <div class="orders-list">
         <% orders.forEach(order => { %>
           <div class="order-card">
             <div class="order-header">
-              <h3>Order #<%= order._id.toString().slice(-6) %></h3>
+              <h3>Đơn #<%= order._id.toString().slice(-6) %></h3>
               <span class="status status-<%= order.status %>"><%= order.status %></span>
             </div>
-            <p>Date: <%= new Date(order.createdAt).toLocaleDateString() %></p>
-            <p>Total: $<%= order.totalAmount.toFixed(2) %></p>
-            <p>Items: <%= order.items.length %></p>
+            <p>Ngày: <%= new Date(order.createdAt).toLocaleDateString('vi-VN') %></p>
+            <p>Tổng cộng: <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(order.totalAmount || 0)) %></p>
+            <p>Sản phẩm: <%= order.items.length %></p>
             <div class="order-actions">
-              <a href="/orders/<%= order._id %>" class="btn btn-sm btn-secondary">View Details</a>
+              <a href="/orders/<%= order._id %>" class="btn btn-sm btn-secondary">Xem chi tiết</a>
               <% if (order.status === 'pending') { %>
                 <form action="/orders/<%= order._id %>/cancel" method="POST" style="display: inline;">
-                  <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Cancel this order?')">Cancel Order</button>
+                  <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn hủy đơn hàng này?')">Hủy đơn hàng</button>
                 </form>
               <% } %>
             </div>

@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -207,19 +207,19 @@
         <div class="product-info">
           <h1><%= product.name %></h1>
           <p class="category">
-            <strong>Category:</strong>
-            <%= product.category ? product.category.name : "No Category" %>
+            <strong>Danh mục:</strong>
+            <%= product.category ? product.category.name : "Chưa có danh mục" %>
           </p>
-          <p class="price">$<%= product.price.toFixed(2) %></p>
+          <p class="price"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price || 0)) %></p>
           <p class="description"><%= product.description %></p>
-          <p class="stock">Available: <%= product.stock %> units</p>
-          <p class="sold">Sold: <%= product.sold %> units</p>
-          <p class="views">Views: <%= product.viewCount || 0 %></p>
+          <p class="stock">Còn hàng: <%= product.stock %> sản phẩm</p>
+          <p class="sold">Đã bán: <%= product.sold %> sản phẩm</p>
+          <p class="views">Lượt xem: <%= product.viewCount || 0 %></p>
 
           <% if (product.stock > 0) { %>
           <form action="/cart/add" method="POST">
             <input type="hidden" name="productId" value="<%= product._id %>" />
-            <label>Quantity:</label>
+            <label>Số lượng:</label>
             <input
               type="number"
               name="quantity"
@@ -227,31 +227,31 @@
               min="1"
               max="<%= product.stock %>"
             />
-            <button class="btn">Add to Cart</button>
+            <button class="btn">Thêm vào giỏ</button>
           </form>
           <% } else { %>
           <p class="out-of-stock" style="color: red; font-weight: bold">
-            Out of Stock
+            Hết hàng
           </p>
           <% } %>
         </div>
       </div>
 
       <!-- COMMENTS -->
-      <h2>Comments</h2>
+      <h2>Bình luận</h2>
 
       <!-- COMMENT FORM -->
       <% if (user && user.userId) { %>
       <form action="/products/<%= product._id %>/comment" method="POST">
         <textarea
           name="content"
-          placeholder="Write a comment..."
+          placeholder="Viết bình luận..."
           required
         ></textarea>
-        <button class="btn">Send</button>
+        <button class="btn">Gửi</button>
       </form>
       <% } else { %>
-      <p>You must <a href="/login">login</a> to comment.</p>
+      <p>Bạn cần <a href="/auth/login">đăng nhập</a> để bình luận.</p>
       <% } %>
 
       <div class="comments">
@@ -264,7 +264,7 @@
 
           <% if (user && user.userId) { %>
           <div class="reply-btn" onclick="toggleReply('<%= c._id %>')">
-            Reply
+            Phản hồi
           </div>
           <% } %>
 
@@ -275,8 +275,8 @@
             method="POST"
           >
             <input type="hidden" name="parentId" value="<%= c._id %>" />
-            <textarea name="content" placeholder="Write a reply..."></textarea>
-            <button class="btn" style="margin-top: 5px">Reply</button>
+            <textarea name="content" placeholder="Viết phản hồi..."></textarea>
+            <button class="btn" style="margin-top: 5px">Phản hồi</button>
           </form>
 
           <% c.replies.forEach(r => { %>

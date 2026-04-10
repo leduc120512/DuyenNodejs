@@ -1,9 +1,9 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= category ? 'Edit' : 'Add' %> Category - Shop thương mại điện tử</title>
+  <title><%= category ? 'Sửa' : 'Thêm' %> danh mục - Shop thương mại điện tử</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
     <%- include('../partials/admin-sidebar') %>
     <main class="admin-main">
       <div class="container">
-    <h1><%= category ? 'Edit' : 'Add New' %> Category</h1>
+    <h1><%= category ? 'Sửa' : 'Thêm mới' %> danh mục</h1>
     
     <% if (error) { %>
       <div class="alert alert-error"><%= error %></div>
@@ -19,26 +19,26 @@
     
     <form action="<%= category ? `/admin/categories/edit/${category._id}` : '/admin/categories/add' %>" method="POST" enctype="multipart/form-data" class="form">
       <div class="form-group">
-        <label for="name">Category Name</label>
+        <label for="name">Tên danh mục</label>
         <input type="text" id="name" name="name" value="<%= category ? category.name : '' %>" required>
       </div>
       
       <div class="form-group">
-        <label for="description">Description</label>
+        <label for="description">Mô tả</label>
         <textarea id="description" name="description" rows="4"><%= category ? category.description : '' %></textarea>
       </div>
 
       <div class="form-group">
-        <label for="image">Category Image</label>
+        <label for="image">Ảnh danh mục</label>
         <% if (category && category.image) { %>
-          <img src="<%= category.image %>" alt="Current category image" class="current-image">
+          <img src="<%= category.image %>" alt="Ảnh danh mục hiện tại" class="current-image">
         <% } %>
         <input type="file" id="image" name="image" accept="image/*">
       </div>
       
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary"><%= category ? 'Update' : 'Add' %> Category</button>
-        <a href="/admin/categories" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary"><%= category ? 'Cập nhật' : 'Thêm' %> danh mục</button>
+        <a href="/admin/categories" class="btn btn-secondary">Hủy</a>
       </div>
     </form>
       </div>

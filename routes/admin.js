@@ -134,36 +134,21 @@ router.get("/dashboard", isAdmin, async (req, res) => {
         { $match: { status: { $ne: "cancelled" } } },
         { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
       ]),
+      Order.aggregate([
+        {
+          $match: {
+            status: { $ne: "cancelled" },
+            createdAt: { $gte: fromDate },
+          },
+        },
+        {
           $group: {
-          const productsUnsorted = await Product.find(query)
-            .populate("category");
-
-          // Sort: in stock first, sold out at the end
-          const products = productsUnsorted.sort((a, b) => {
-            const aInStock = a.stock > 0 ? 1 : 0;
-            const bInStock = b.stock > 0 ? 1 : 0;
-      
-            if (aInStock !== bInStock) {
-              return bInStock - aInStock; // In stock products first
-            }
-      
-            // For products with same stock status, sort by selected field
-            if (sortBy === "viewCount" || sortBy === "sold") {
-              return sortOrder === 1 
-                ? (a[sortBy] || 0) - (b[sortBy] || 0)
-                : (b[sortBy] || 0) - (a[sortBy] || 0);
-            }
-      
-            // For homeOrder
-            return sortOrder === 1
-              ? (a.homeOrder || 9999) - (b.homeOrder || 9999)
-              : (b.homeOrder || 9999) - (a.homeOrder || 9999);
-          });
             _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
             revenue: { $sum: "$totalAmount" },
             orders: { $sum: 1 },
           },
         },
+        { $sort: { _id: 1 } },
       ]),
       Product.find()
         .sort({ viewCount: -1, sold: -1 })
@@ -450,17 +435,18 @@ router.post(
         tags,
         searchText,
       } = req.body;
-      
-        // Validate required fields
-        if (!name || !description || !price || !category) {
-          const categories = await Category.find().sort({ name: 1 });
-          return res.render("admin/product-form", {
-            user: req.session,
-            product: null,
-            categories,
-            error: "Vui lòng điền đầy đủ các trường bắt buộc (Tên, Mô tả, Giá, Danh mục)",
-          });
-        }
+
+      // Validate required fields
+      if (!name || !description || !price || !category) {
+        const categories = await Category.find().sort({ name: 1 });
+        return res.render("admin/product-form", {
+          user: req.session,
+          product: null,
+          categories,
+          error:
+            "Vui lòng điền đầy đủ các trường bắt buộc (Tên, Mô tả, Giá, Danh mục)",
+        });
+      }
 
       const uploadedImages = Array.isArray(req.files)
         ? req.files.map((file) => `/uploads/${file.filename}`)
@@ -490,13 +476,13 @@ router.post(
       await syncProductSearchData(product._id);
       res.redirect("/admin/products");
     } catch (error) {
-        console.error("Add product error:", error);
+      console.error("Add product error:", error);
       const categories = await Category.find().sort({ name: 1 });
       res.render("admin/product-form", {
         user: req.session,
         product: null,
         categories,
-          error: "Lỗi khi thêm sản phẩm: " + error.message,
+        error: "Lỗi khi thêm sản phẩm: " + error.message,
       });
     }
   },
