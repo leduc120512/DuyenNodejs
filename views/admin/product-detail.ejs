@@ -87,7 +87,7 @@
             </div>
             <div class="detail-card">
               <h4>Giá</h4>
-              <p>$<%= Number(product.price || 0).toFixed(2) %></p>
+              <p><%= Number(product.price || 0).toLocaleString('vi-VN') %> ₫</p>
             </div>
             <div class="detail-card">
               <h4>Tồn kho</h4>

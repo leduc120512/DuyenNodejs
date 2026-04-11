@@ -63,7 +63,7 @@
             </td>
             <td><%= product.name %></td>
             <td><%= product.category ? product.category.name : '-' %></td>
-            <td>$<%= product.price.toFixed(2) %></td>
+            <td><%= Number(product.price || 0).toLocaleString('vi-VN') %> ₫</td>
             <td style="<%= product.stock <= 0 ? 'color:#dc3545;font-weight:700;' : '' %>"><%= product.stock %><%= product.stock <= 0 ? ' ⚠️ HẾT HÀNG' : '' %></td>
             <td><%= product.sold %></td>
             <td><%= product.viewCount || 0 %></td>

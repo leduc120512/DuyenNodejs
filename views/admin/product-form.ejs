@@ -70,8 +70,8 @@
       
       <div class="form-row">
         <div class="form-group">
-          <label for="price">Price ($)</label>
-          <input type="number" id="price" name="price" step="0.01" value="<%= product ? product.price : '' %>" required>
+          <label for="price">Giá (₫)</label>
+          <input type="number" id="price" name="price" step="1000" value="<%= product ? product.price : '' %>" required>
         </div>
         
         <div class="form-group">
@@ -211,7 +211,7 @@
       
           if (!name || !description || !price || !category || stock === '') {
             e.preventDefault();
-            alert('Vui lòng điền đầy đủ: Tên, Mô tả, Giá, Danh mục, Tồn kho');
+            alert('Vui lòng điền đầy đủ: Tên, Mô tả, Giá (VND), Danh mục, Tồn kho');
             return false;
           }
       

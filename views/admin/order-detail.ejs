@@ -51,14 +51,14 @@
         <% order.items.forEach(item => { %>
           <tr>
             <td><%= item.product.name %></td>
-            <td>$<%= item.price.toFixed(2) %></td>
+            <td><%= Number(item.price || 0).toLocaleString('vi-VN') %> ₫</td>
             <td><%= item.quantity %></td>
-            <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+            <td><%= Number(item.price * item.quantity || 0).toLocaleString('vi-VN') %> ₫</td>
           </tr>
         <% }) %>
         <tr class="total-row">
           <td colspan="3"><strong>Total</strong></td>
-          <td><strong>$<%= order.totalAmount.toFixed(2) %></strong></td>
+          <td><strong><%= Number(order.totalAmount || 0).toLocaleString('vi-VN') %> ₫</strong></td>
         </tr>
       </tbody>
     </table>

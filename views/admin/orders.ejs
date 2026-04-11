@@ -35,7 +35,7 @@
             <td>#<%= order._id.toString().slice(-6) %></td>
          <td><%= order.user ? order.user.fullName : 'Unknown User' %></td>
 
-          <td>$<%= order.totalAmount ? order.totalAmount.toFixed(2) : 'N/A' %></td>
+          <td><%= Number(order.totalAmount || 0).toLocaleString('vi-VN') %> ₫</td>
 
             <td><span class="status status-<%= order.status %>"><%= order.status %></span></td>
             <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
